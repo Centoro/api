@@ -1,0 +1,2 @@
+ALTER TABLE friday_drops ADD COLUMN price DECIMAL(18,2) NULL;
+ALTER TABLE monthly_offers ADD COLUMN price DECIMAL(18,2) NULL;
