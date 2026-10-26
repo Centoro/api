@@ -1,6 +1,3 @@
-# api
-Backend REST API and database architecture powering the Centoro Enterprise Admin Panel and web services.
-
 # Centoro API
 
 The backend REST API and database service for the **Centoro Enterprise Admin Panel**. This service handles authentication, data processing, and business logic for all Centoro operations.
