@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS company_settings (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    company_name VARCHAR(255),
+    trading_as VARCHAR(255),
+    vat_rate DECIMAL(10,2),
+    currency VARCHAR(20),
+    override_code VARCHAR(255),
+    country VARCHAR(100),
+    reg_number VARCHAR(100),
+    tax_number VARCHAR(100),
+    profile_image_url TEXT,
+    theme_primary VARCHAR(30),
+    theme_primary_dark VARCHAR(30),
+    theme_primary_light VARCHAR(30),
+    theme_accent VARCHAR(30),
+    theme_bg_base VARCHAR(30),
+    theme_bg_surface VARCHAR(30),
+    revenue_target_2026 DECIMAL(15,2),
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
