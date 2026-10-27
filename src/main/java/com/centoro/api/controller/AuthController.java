@@ -80,6 +80,28 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("success", false, "message", "Account is not active. Complete verification or contact an administrator."));
         }
         
+        // --- NEW CHECK: BYPASS OTP FOR ADMIN ---
+        String role = String.valueOf(account.get("role")).toLowerCase();
+        if ("admin".equals(role)) {
+            String username = (String) account.get("username");
+            String token = jwtUtil.generateToken(username != null ? username : (String) account.get("email"));
+            
+            Map<String, Object> user = new HashMap<>();
+            user.put("id", account.get("id")); 
+            user.put("staffId", account.get("staffId")); 
+            user.put("username", username);
+            
+            String staffName = ((account.get("firstName") == null ? "" : account.get("firstName")) + " " + (account.get("surname") == null ? "" : account.get("surname"))).trim();
+            user.put("name", staffName.isBlank() ? account.get("name") : staffName);
+            user.put("email", account.get("email")); 
+            user.put("role", account.get("role") != null ? account.get("role") : "admin");
+            user.put("canResetPasswords", account.get("canResetPasswords")); 
+            user.put("canApprove", account.get("canApprove"));
+            
+            return ResponseEntity.ok(Map.of("success", true, "data", Map.of("token", token, "user", user)));
+        }
+        // ----------------------------------------
+
         String channel = request.getChannel() == null ? "email" : request.getChannel().toLowerCase();
         String destination = "sms".equals(channel) ? (String) account.get("otpPhone") : (String) account.get("email");
         try {
