@@ -35,6 +35,10 @@ public class AuthController {
     
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        // 1. Get the identifier (will be email if provided by frontend, otherwise username)
+        String identifier = request.getLoginIdentifier();
+
+        // 2. Check BOTH email and username columns against that single identifier
         var accounts = jdbcTemplate.<Map<String, Object>>query(
             "SELECT u.id, u.email, u.password_hash, u.name, u.role, u.status, s.id AS staff_id, " +
             "s.username, s.first_name, s.surname, s.can_reset_passwords, s.can_approve " +
@@ -57,7 +61,7 @@ public class AuthController {
                 account.put("canApprove", resultSet.getBoolean("can_approve"));
                 account.put("otpPhone", resultSet.getString("otp_phone"));
                 return account;
-            }, request.getUsername(), request.getUsername());
+            }, identifier, identifier); // <-- CHANGED: Now uses the smart identifier
 
         if (accounts.isEmpty()) {
             return ResponseEntity.status(401).body(Map.of(
