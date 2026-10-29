@@ -20,8 +20,9 @@ public class StaffWarningsController {
         return ResponseEntity.ok(Map.of("success", true, "data", warningRepository.findAll()));
     }
     
+    // ✅ FIX: Changed @PathVariable from Long to String
     @GetMapping("/staff/{staffId}")
-    public ResponseEntity<?> getWarningsByStaff(@PathVariable Long staffId) {
+    public ResponseEntity<?> getWarningsByStaff(@PathVariable String staffId) {
         return ResponseEntity.ok(Map.of("success", true, "data", warningRepository.findByStaffId(staffId)));
     }
     
