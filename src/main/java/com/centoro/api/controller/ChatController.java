@@ -8,6 +8,7 @@ import com.centoro.api.entities.Chat;
 import com.centoro.api.entities.ChatMessage;
 import com.centoro.api.entities.Client;
 import com.centoro.api.entities.JobCard;
+import com.centoro.api.entities.Staff;
 import com.centoro.api.repositories.ClientRepository;
 import com.centoro.api.repositories.StaffRepository;
 import com.centoro.api.repositories.JobCardRepository;
@@ -75,14 +76,14 @@ public class ChatController {
     public ResponseEntity<?> createChat(@RequestBody ChatRequest request) {
         if (request.getClientId() == null) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client ID is required"));
         if (!clientRepository.existsById(request.getClientId())) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
-        
+
         Chat chat = new Chat();
         chat.setClientId(request.getClientId());
         chat.setSubject(request.getSubject());
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
         chat.setLinkedJobId(request.getLinkedJobId());
-        
+
         Chat saved = chatService.createChat(chat);
         if (request.getText() != null && !request.getText().isEmpty()) {
             ChatMessage message = new ChatMessage();
@@ -98,22 +99,22 @@ public class ChatController {
     public ResponseEntity<?> addMessage(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Optional<Chat> chatOpt = chatService.getChatById(id);
         if (chatOpt.isEmpty()) return ResponseEntity.notFound().build();
-        
+
         String from = (String) request.get("from");
         String text = (String) request.get("text");
-        String staffId = request.get("staffId") != null ? request.get("staffId").toString() : null;
-        
+        String staffId = request.get("staffId") != null ? String.valueOf(request.get("staffId")) : null;
+
         if (text == null || text.isEmpty()) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Message text is required"));
-        
+
         ChatMessage message = new ChatMessage();
         message.setChatId(id);
         message.setFrom(from != null ? from : "client");
         message.setText(text);
         message.setStaffId(staffId);
-        
+
         ChatMessage saved = chatService.addMessage(message);
         if ("client".equals(from)) chatService.updateChatStatus(id, "open");
-        
+
         return ResponseEntity.ok(Map.of("success", true, "data", convertMessageToDTO(saved), "message", "Message sent successfully"));
     }
 
@@ -143,8 +144,8 @@ public class ChatController {
         Chat chat = chatOpt.get();
         String title = (String) request.get("title");
         if (title == null || title.isEmpty()) title = chat.getSubject();
-        String assigneeId = request.get("assigneeId") != null ? request.get("assigneeId").toString() : null;
-        
+        String assigneeId = request.get("assigneeId") != null ? String.valueOf(request.get("assigneeId")) : null;
+
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setTitle(title);
@@ -161,13 +162,13 @@ public class ChatController {
         jobCard.setLoggedBy("System");
         jobCard.setLoggedAt(new Date());
         jobCard.setSource("chat");
-        
+
         JobCard saved = jobCardRepository.save(jobCard);
         chat.setLinkedJobId(saved.getId());
         chat.setStatus("in_progress");
         chat.setUpdatedAt(new Date());
         chatService.updateChatStatus(id, "in_progress");
-        
+
         return ResponseEntity.ok(Map.of("success", true, "data", Map.of("chat", convertToDTO(chat), "jobCard", saved), "message", "Chat converted to job card successfully"));
     }
 
@@ -179,11 +180,11 @@ public class ChatController {
         String date = request.get("date");
         if (date == null || date.isEmpty()) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Date is required (YYYY-MM-DD)"));
         if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid date format. Use YYYY-MM-DD"));
-        
+
         chat.setCalendarDate(java.sql.Date.valueOf(date));
         chat.setUpdatedAt(new Date());
         chatService.updateChatStatus(id, chat.getStatus());
-        
+
         Client client = clientRepository.findById(chat.getClientId()).orElse(null);
         CalendarNote note = new CalendarNote();
         note.setDate(date);
@@ -191,7 +192,7 @@ public class ChatController {
         note.setImportance(chat.getPriority());
         note.setCreatedBy("System");
         calendarNoteService.createNote(note);
-        
+
         return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(chat), "message", "Chat linked to calendar successfully"));
     }
 
@@ -238,8 +239,8 @@ public class ChatController {
         dto.setText(message.getText());
         dto.setAttachment(message.getAttachment());
         dto.setCreatedAt(message.getCreatedAt());
-        if (message.getStaffId() != null) {
-            staffRepository.findById(message.getStaffId()).ifPresent(s -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+        if (message.getStaffId() != null && !message.getStaffId().isBlank()) {
+            staffRepository.findById(message.getStaffId()).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
         }
         return dto;
     }
