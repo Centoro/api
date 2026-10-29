@@ -118,4 +118,10 @@ public class StoreOrderController {
     public ResponseEntity<String> contract(@PathVariable String invoiceId) { // FIX: String
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null || invoice.getStatus() != Invoice.InvoiceStatus.paid) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\nInvoice: " + invoice.getInvoiceId() + "\nItem: " +
+        return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\nInvoice: " + invoice.getInvoiceId() + "\nItem: " + invoice.getService() + "\nStatus: PAID\n\n");
+    }
+
+    private static String text(Object value) { return value == null ? "" : String.valueOf(value).trim(); }
+    private static Double number(Object value) { try { return value == null ? null : Double.valueOf(String.valueOf(value)); } catch (NumberFormatException e) { return null; } }
+    private static String escape(String value) { return value.replace("\\", "\\\\").replace("\"", "\\\""); }
+}
