@@ -47,85 +47,52 @@ public class ChatController {
     @GetMapping
     public ResponseEntity<?> getAllChats() {
         List<Chat> chats = chatService.getAllChats();
-        List<ChatDTO> chatDTOs = chats.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", chatDTOs
-        ));
+        List<ChatDTO> chatDTOs = chats.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", chatDTOs));
     }
 
     @GetMapping("/open")
     public ResponseEntity<?> getOpenChats() {
         List<Chat> chats = chatService.getOpenChats();
-        List<ChatDTO> chatDTOs = chats.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", chatDTOs
-        ));
+        List<ChatDTO> chatDTOs = chats.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", chatDTOs));
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getChatsByClient(@PathVariable Long clientId) {
+    public ResponseEntity<?> getChatsByClient(@PathVariable String clientId) {
+        // FIX: clientId changed to String
         List<Chat> chats = chatService.getChatsByClient(clientId);
-        List<ChatDTO> chatDTOs = chats.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", chatDTOs
-        ));
+        List<ChatDTO> chatDTOs = chats.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", chatDTOs));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getChat(@PathVariable Long id) {
         Optional<Chat> chatOpt = chatService.getChatById(id);
-        if (chatOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (chatOpt.isEmpty()) return ResponseEntity.notFound().build();
         ChatDTO dto = convertToDTO(chatOpt.get());
-        dto.setMessages(chatService.getMessages(id).stream()
-            .map(this::convertMessageToDTO)
-            .collect(Collectors.toList()));
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", dto
-        ));
+        dto.setMessages(chatService.getMessages(id).stream().map(this::convertMessageToDTO).collect(Collectors.toList()));
+        return ResponseEntity.ok(Map.of("success", true, "data", dto));
     }
 
     @GetMapping("/{id}/messages")
     public ResponseEntity<?> getChatMessages(@PathVariable Long id) {
         List<ChatMessage> messages = chatService.getMessages(id);
-        List<ChatMessageDTO> messageDTOs = messages.stream()
-            .map(this::convertMessageToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", messageDTOs
-        ));
+        List<ChatMessageDTO> messageDTOs = messages.stream().map(this::convertMessageToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", messageDTOs));
     }
 
     @PostMapping
     public ResponseEntity<?> createChat(@RequestBody ChatRequest request) {
         if (request.getClientId() == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Client ID is required"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client ID is required"));
         }
-        
         if (!clientRepository.existsById(request.getClientId())) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Client not found"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
         }
         
         Chat chat = new Chat();
-        chat.setClientId(request.getClientId());
+        chat.setClientId(request.getClientId()); // FIX: String now
         chat.setSubject(request.getSubject());
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
@@ -142,37 +109,27 @@ public class ChatController {
         }
         
         ChatDTO dto = convertToDTO(saved);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", dto,
-            "message", "Chat created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", dto, "message", "Chat created successfully"));
     }
 
     @PostMapping("/{id}/messages")
     public ResponseEntity<?> addMessage(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Optional<Chat> chatOpt = chatService.getChatById(id);
-        if (chatOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (chatOpt.isEmpty()) return ResponseEntity.notFound().build();
         
         String from = (String) request.get("from");
         String text = (String) request.get("text");
-        Long staffId = request.get("staffId") != null ? 
-            Long.valueOf(request.get("staffId").toString()) : null;
+        String staffId = request.get("staffId") != null ? request.get("staffId").toString() : null;
         
         if (text == null || text.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Message text is required"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Message text is required"));
         }
         
         ChatMessage message = new ChatMessage();
         message.setChatId(id);
         message.setFrom(from != null ? from : "client");
         message.setText(text);
-        message.setStaffId(staffId);
+        message.setStaffId(staffId); // FIX: String now
         
         ChatMessage saved = chatService.addMessage(message);
         
@@ -180,30 +137,18 @@ public class ChatController {
             chatService.updateChatStatus(id, "open");
         }
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertMessageToDTO(saved),
-            "message", "Message sent successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertMessageToDTO(saved), "message", "Message sent successfully"));
     }
 
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateChatStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String status = request.get("status");
         if (status == null || status.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Status is required"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Status is required"));
         }
-        
         try {
             Chat updated = chatService.updateChatStatus(id, status);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", convertToDTO(updated),
-                "message", "Chat status updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(updated), "message", "Chat status updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -211,31 +156,21 @@ public class ChatController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable Long id) {
-        if (!chatService.getChatById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (!chatService.getChatById(id).isPresent()) return ResponseEntity.notFound().build();
         chatService.deleteChat(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Chat deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Chat deleted successfully"));
     }
 
     @PostMapping("/{id}/convert-to-job")
     public ResponseEntity<?> convertChatToJob(@PathVariable Long id, @RequestBody Map<String, Object> request) {
         Optional<Chat> chatOpt = chatService.getChatById(id);
-        if (chatOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (chatOpt.isEmpty()) return ResponseEntity.notFound().build();
         
         Chat chat = chatOpt.get();
         String title = (String) request.get("title");
-        if (title == null || title.isEmpty()) {
-            title = chat.getSubject();
-        }
+        if (title == null || title.isEmpty()) title = chat.getSubject();
         
-        Long assigneeId = request.get("assigneeId") != null ? 
-            Long.valueOf(request.get("assigneeId").toString()) : null;
+        String assigneeId = request.get("assigneeId") != null ? request.get("assigneeId").toString() : null;
         
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
@@ -261,37 +196,21 @@ public class ChatController {
         chat.setUpdatedAt(new Date());
         chatService.updateChatStatus(id, "in_progress");
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", Map.of(
-                "chat", convertToDTO(chat),
-                "jobCard", saved
-            ),
-            "message", "Chat converted to job card successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", Map.of("chat", convertToDTO(chat), "jobCard", saved), "message", "Chat converted to job card successfully"));
     }
 
     @PostMapping("/{id}/link-calendar")
     public ResponseEntity<?> linkChatToCalendar(@PathVariable Long id, @RequestBody Map<String, String> request) {
         Optional<Chat> chatOpt = chatService.getChatById(id);
-        if (chatOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (chatOpt.isEmpty()) return ResponseEntity.notFound().build();
         
         Chat chat = chatOpt.get();
         String date = request.get("date");
         if (date == null || date.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Date is required (YYYY-MM-DD)"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Date is required (YYYY-MM-DD)"));
         }
-        
         if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Invalid date format. Use YYYY-MM-DD"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid date format. Use YYYY-MM-DD"));
         }
         
         chat.setCalendarDate(java.sql.Date.valueOf(date));
@@ -301,58 +220,30 @@ public class ChatController {
         Client client = clientRepository.findById(chat.getClientId()).orElse(null);
         CalendarNote note = new CalendarNote();
         note.setDate(date);
-        note.setText("💬 Client Follow-up: " + chat.getSubject() + 
-            (client != null ? " (" + client.getName() + ")" : ""));
+        note.setText("💬 Client Follow-up: " + chat.getSubject() + (client != null ? " (" + client.getName() + ")" : ""));
         note.setImportance(chat.getPriority());
         note.setCreatedBy("System");
-        
         calendarNoteService.createNote(note);
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertToDTO(chat),
-            "message", "Chat linked to calendar successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(chat), "message", "Chat linked to calendar successfully"));
     }
 
     @GetMapping("/client/{clientId}/open")
-    public ResponseEntity<?> getOpenChatsByClient(@PathVariable Long clientId) {
-        List<Chat> chats = chatService.getChatsByClient(clientId).stream()
-            .filter(c -> !"resolved".equals(c.getStatus()))
-            .collect(Collectors.toList());
-        List<ChatDTO> chatDTOs = chats.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", chatDTOs
-        ));
+    public ResponseEntity<?> getOpenChatsByClient(@PathVariable String clientId) {
+        // FIX: clientId changed to String
+        List<Chat> chats = chatService.getChatsByClient(clientId).stream().filter(c -> !"resolved".equals(c.getStatus())).collect(Collectors.toList());
+        List<ChatDTO> chatDTOs = chats.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", chatDTOs));
     }
 
     @GetMapping("/stats")
     public ResponseEntity<?> getChatStats() {
         long open = chatService.getOpenChats().size();
-        long inProgress = chatService.getAllChats().stream()
-            .filter(c -> "in_progress".equals(c.getStatus()))
-            .count();
-        long resolved = chatService.getAllChats().stream()
-            .filter(c -> "resolved".equals(c.getStatus()))
-            .count();
-        long linkedJobs = chatService.getAllChats().stream()
-            .filter(c -> c.getLinkedJobId() != null)
-            .count();
-        
-        Map<String, Object> stats = Map.of(
-            "open", open,
-            "inProgress", inProgress,
-            "resolved", resolved,
-            "linkedJobs", linkedJobs
-        );
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        long inProgress = chatService.getAllChats().stream().filter(c -> "in_progress".equals(c.getStatus())).count();
+        long resolved = chatService.getAllChats().stream().filter(c -> "resolved".equals(c.getStatus())).count();
+        long linkedJobs = chatService.getAllChats().stream().filter(c -> c.getLinkedJobId() != null).count();
+        Map<String, Object> stats = Map.of("open", open, "inProgress", inProgress, "resolved", resolved, "linkedJobs", linkedJobs);
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     private ChatDTO convertToDTO(Chat chat) {
@@ -360,10 +251,7 @@ public class ChatController {
         dto.setId(chat.getId());
         dto.setChatId(chat.getChatId());
         dto.setClientId(chat.getClientId());
-        
-        Optional<Client> clientOpt = clientRepository.findById(chat.getClientId());
-        clientOpt.ifPresent(c -> dto.setClientName(c.getName()));
-        
+        clientRepository.findById(chat.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
         dto.setSubject(chat.getSubject());
         dto.setStatus(chat.getStatus());
         dto.setPriority(chat.getPriority());
@@ -384,12 +272,9 @@ public class ChatController {
         dto.setText(message.getText());
         dto.setAttachment(message.getAttachment());
         dto.setCreatedAt(message.getCreatedAt());
-        
         if (message.getStaffId() != null) {
-            Optional<Staff> staffOpt = staffRepository.findById(message.getStaffId());
-            staffOpt.ifPresent(s -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+            staffRepository.findById(message.getStaffId()).ifPresent(s -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
         }
-        
         return dto;
     }
 }
