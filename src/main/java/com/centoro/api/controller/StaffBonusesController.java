@@ -20,8 +20,9 @@ public class StaffBonusesController {
         return ResponseEntity.ok(Map.of("success", true, "data", bonusRepository.findAll()));
     }
     
+    // ✅ FIX: Changed @PathVariable from Long to String
     @GetMapping("/staff/{staffId}")
-    public ResponseEntity<?> getBonusesByStaff(@PathVariable Long staffId) {
+    public ResponseEntity<?> getBonusesByStaff(@PathVariable String staffId) {
         return ResponseEntity.ok(Map.of("success", true, "data", bonusRepository.findByStaffId(staffId)));
     }
     
