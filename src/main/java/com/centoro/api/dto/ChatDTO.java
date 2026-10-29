@@ -6,7 +6,7 @@ import java.util.List;
 public class ChatDTO {
     private Long id;
     private String chatId;
-    private Long clientId;
+    private String clientId;  // FIX
     private String clientName;
     private String subject;
     private String status;
@@ -16,14 +16,13 @@ public class ChatDTO {
     private Date createdAt;
     private Date updatedAt;
     private List<ChatMessageDTO> messages;
-    
-    // Getters and Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getChatId() { return chatId; }
     public void setChatId(String chatId) { this.chatId = chatId; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }
     public String getSubject() { return subject; }
