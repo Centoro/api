@@ -8,8 +8,9 @@ import java.util.Date;
 public class Invoice {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36)
+    private String id;
     
     @Column(name = "invoice_id", unique = true, nullable = false, length = 50)
     private String invoiceId;
@@ -17,11 +18,13 @@ public class Invoice {
     @Column(name = "tracking_number", unique = true, nullable = false, length = 100)
     private String trackingNumber;
     
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    // FIX: Changed from Long to String
+    @Column(name = "client_id", nullable = false, length = 36)
+    private String clientId;
     
-    @Column(name = "project_id")
-    private Long projectId;
+    // FIX: Changed from Long to String
+    @Column(name = "project_id", length = 36)
+    private String projectId;
     
     @Column(length = 255)
     private String service;
@@ -76,17 +79,16 @@ public class Invoice {
         unpaid, partial, paid, overdue
     }
     
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getInvoiceId() { return invoiceId; }
     public void setInvoiceId(String invoiceId) { this.invoiceId = invoiceId; }
     public String getTrackingNumber() { return trackingNumber; }
     public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
+    public String getProjectId() { return projectId; }
+    public void setProjectId(String projectId) { this.projectId = projectId; }
     public String getService() { return service; }
     public void setService(String service) { this.service = service; }
     public String getItems() { return items; }
