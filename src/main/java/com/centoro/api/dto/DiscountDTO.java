@@ -7,15 +7,14 @@ public class DiscountDTO {
     private String discountId;
     private Date date;
     private String ref;
-    private Long clientId;
+    private String clientId;  // FIX
     private String clientName;
     private String description;
     private Double discountPct;
     private Double discountAmount;
     private String source;
     private Date createdAt;
-    
-    // Getters and Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getDiscountId() { return discountId; }
@@ -24,8 +23,8 @@ public class DiscountDTO {
     public void setDate(Date date) { this.date = date; }
     public String getRef() { return ref; }
     public void setRef(String ref) { this.ref = ref; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }
     public String getDescription() { return description; }
