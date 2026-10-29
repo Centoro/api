@@ -31,77 +31,45 @@ public class VouchersController {
     public ResponseEntity<?> getAllVouchers() {
         List<Voucher> vouchers = voucherRepository.findAll();
         vouchers.removeIf(v -> v.getDeletedAt() != null);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", vouchers
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", vouchers));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getVoucher(@PathVariable Long id) {
         Optional<Voucher> voucher = voucherRepository.findById(id);
-        if (voucher.isEmpty() || voucher.get().getDeletedAt() != null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", voucher.get()
-        ));
+        if (voucher.isEmpty() || voucher.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", voucher.get()));
     }
 
     @GetMapping("/code/{code}")
     public ResponseEntity<?> getVoucherByCode(@PathVariable String code) {
         Optional<Voucher> voucher = voucherRepository.findByCode(code.toUpperCase());
-        if (voucher.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", voucher.get()
-        ));
+        if (voucher.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", voucher.get()));
     }
 
     @GetMapping("/active")
     public ResponseEntity<?> getActiveVouchers() {
         List<Voucher> vouchers = voucherRepository.findActiveVouchers();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", vouchers
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", vouchers));
     }
 
     @PostMapping
     public ResponseEntity<?> createVoucher(@RequestBody Voucher voucher) {
-        // Validate client exists if provided
         if (voucher.getClientId() != null && !clientRepository.existsById(voucher.getClientId())) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Client not found"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
         }
-        
         Voucher saved = voucherService.createVoucher(voucher);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Voucher created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Voucher created successfully"));
     }
 
     @PostMapping("/{id}/redeem")
     public ResponseEntity<?> redeemVoucher(@PathVariable Long id) {
         try {
             Voucher updated = voucherService.redeemVoucher(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", updated,
-                "message", "Voucher redeemed successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Voucher redeemed successfully"));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", e.getMessage()
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
@@ -109,11 +77,7 @@ public class VouchersController {
     public ResponseEntity<?> updateVoucher(@PathVariable Long id, @RequestBody Voucher voucher) {
         try {
             Voucher updated = voucherService.updateVoucher(id, voucher);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", updated,
-                "message", "Voucher updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Voucher updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -123,83 +87,54 @@ public class VouchersController {
     public ResponseEntity<?> deleteVoucher(@PathVariable Long id) {
         try {
             voucherService.softDeleteVoucher(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Voucher deleted successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Voucher deleted successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // ============ ADDITIONAL ENDPOINTS ============
-
     @GetMapping("/stats")
     public ResponseEntity<?> getVoucherStats() {
         Map<String, Object> stats = voucherService.getVoucherStats();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @GetMapping("/categories")
     public ResponseEntity<?> getVoucherCategories() {
         List<String> categories = voucherService.getVoucherCategories();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", categories
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", categories));
     }
 
     @GetMapping("/types")
     public ResponseEntity<?> getVoucherTypes() {
         List<String> types = voucherService.getVoucherTypes();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", types
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", types));
     }
 
     @GetMapping("/promo/{promoCode}")
     public ResponseEntity<?> getVoucherByPromoCode(@PathVariable String promoCode) {
         Optional<Voucher> voucher = voucherService.getVoucherByPromoCode(promoCode);
-        if (voucher.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", voucher.get()
-        ));
+        if (voucher.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", voucher.get()));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getVouchersByStatus(@PathVariable String status) {
         List<Voucher> vouchers = voucherService.getVouchersByStatus(status);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", vouchers
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", vouchers));
     }
 
     @GetMapping("/category/{category}")
     public ResponseEntity<?> getVouchersByCategory(@PathVariable String category) {
         List<Voucher> vouchers = voucherService.getVouchersByCategory(category);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", vouchers
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", vouchers));
     }
 
     @PostMapping("/{id}/duplicate")
     public ResponseEntity<?> duplicateVoucher(@PathVariable Long id) {
         try {
             Voucher duplicated = voucherService.duplicateVoucher(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", duplicated,
-                "message", "Voucher duplicated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", duplicated, "message", "Voucher duplicated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -209,11 +144,7 @@ public class VouchersController {
     public ResponseEntity<?> validateVoucher(@PathVariable String code) {
         Optional<Voucher> voucherOpt = voucherService.getVoucherByCode(code);
         if (voucherOpt.isEmpty()) {
-            return ResponseEntity.ok(Map.of(
-                "success", false,
-                "message", "Voucher not found",
-                "valid", false
-            ));
+            return ResponseEntity.ok(Map.of("success", false, "message", "Voucher not found", "valid", false));
         }
         
         Voucher voucher = voucherOpt.get();
@@ -227,13 +158,9 @@ public class VouchersController {
         result.put("voucher", voucher);
         
         if (!isValid) {
-            if (!"active".equals(voucher.getStatus())) {
-                result.put("reason", "Voucher is not active");
-            } else if (voucher.getExpiryDate() != null && voucher.getExpiryDate().before(new Date())) {
-                result.put("reason", "Voucher has expired");
-            } else if (voucher.getUsedCount() >= voucher.getMaxUses()) {
-                result.put("reason", "Voucher has reached maximum uses");
-            }
+            if (!"active".equals(voucher.getStatus())) result.put("reason", "Voucher is not active");
+            else if (voucher.getExpiryDate() != null && voucher.getExpiryDate().before(new Date())) result.put("reason", "Voucher has expired");
+            else if (voucher.getUsedCount() >= voucher.getMaxUses()) result.put("reason", "Voucher has reached maximum uses");
         }
         
         return ResponseEntity.ok(result);
