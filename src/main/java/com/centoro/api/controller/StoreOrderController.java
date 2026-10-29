@@ -41,7 +41,6 @@ public class StoreOrderController {
         String item = text(request.get("item"));
         String license = text(request.get("license"));
         Double amount = number(request.get("amount"));
-        
         if (name.isBlank() || email.isBlank() || item.isBlank() || amount == null || amount < 0) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Required fields missing"));
         }
@@ -59,7 +58,7 @@ public class StoreOrderController {
         Invoice invoice = new Invoice();
         invoice.setInvoiceId("WEB-INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         invoice.setTrackingNumber(invoice.getInvoiceId());
-        invoice.setClientId(client.getId()); // FIX: String
+        invoice.setClientId(client.getId());
         invoice.setService("Website store - " + item);
         invoice.setItems("[{\"item\":\"" + escape(item) + "\",\"license\":\"" + escape(license) + "\"}]");
         invoice.setSubtotal(amount);
@@ -80,13 +79,13 @@ public class StoreOrderController {
 
     @PostMapping("/{invoiceId}/confirm")
     @Transactional
-    public ResponseEntity<?> confirmOrder(@PathVariable String invoiceId, @RequestBody Map<String, Object> request) { // FIX: String
+    public ResponseEntity<?> confirmOrder(@PathVariable String invoiceId, @RequestBody Map<String, Object> request) {
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null) return ResponseEntity.notFound().build();
         if (invoice.getStatus() == Invoice.InvoiceStatus.paid) return ResponseEntity.ok(Map.of("success", true, "message", "Order already confirmed"));
 
         Payment payment = new Payment();
-        payment.setInvoiceId(invoice.getId()); // FIX: String
+        payment.setInvoiceId(invoice.getId());
         payment.setAmount(invoice.getTotal());
         payment.setMethod(text(request.getOrDefault("method", "online")));
         payment.setReference(text(request.getOrDefault("reference", "website-checkout")));
@@ -115,7 +114,7 @@ public class StoreOrderController {
     }
 
     @GetMapping(value = "/{invoiceId}/contract", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> contract(@PathVariable String invoiceId) { // FIX: String
+    public ResponseEntity<String> contract(@PathVariable String invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null || invoice.getStatus() != Invoice.InvoiceStatus.paid) return ResponseEntity.notFound().build();
         return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\nInvoice: " + invoice.getInvoiceId() + "\nItem: " + invoice.getService() + "\nStatus: PAID\n\n");
