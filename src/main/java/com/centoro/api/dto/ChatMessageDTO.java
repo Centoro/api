@@ -7,7 +7,7 @@ public class ChatMessageDTO {
     private String messageId;
     private Long chatId;
     private String from;
-    private String staffId;  // FIX
+    private String staffId;
     private String staffName;
     private String text;
     private String attachment;
