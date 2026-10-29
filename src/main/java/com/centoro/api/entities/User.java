@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.UUID) private String id;
     @Column(unique = true) private String userid;
     @Column(nullable = false) private String name;
     @Column(nullable = false) private String surname;
@@ -17,7 +17,7 @@ public class User {
     private String winner;
     @Column(nullable = false) private boolean hasCompletedEntry = false;
     @Column(nullable = false) private String signupMethod = "EMAIL";
-    public Long getId() { return id; } public void setId(Long id) { this.id = id; }
+    public String getId() { return id; } public void setId(String id) { this.id = id; }
     public String getUserid() { return userid; } public void setUserid(String userid) { this.userid = userid; }
     public String getName() { return name; } public void setName(String name) { this.name = name; }
     public String getSurname() { return surname; } public void setSurname(String surname) { this.surname = surname; }
