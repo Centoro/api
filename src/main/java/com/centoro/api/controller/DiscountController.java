@@ -17,11 +17,8 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 public class DiscountController {
 
-    @Autowired
-    private DiscountService discountService;
-    
-    @Autowired
-    private ClientRepository clientRepository;
+    @Autowired private DiscountService discountService;
+    @Autowired private ClientRepository clientRepository;
 
     @GetMapping
     public ResponseEntity<?> getAllDiscounts() {
@@ -31,7 +28,7 @@ public class DiscountController {
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getDiscountsByClient(@PathVariable String clientId) { // FIX: String
+    public ResponseEntity<?> getDiscountsByClient(@PathVariable String clientId) {
         List<Discount> discounts = discountService.getDiscountsByClient(clientId);
         List<DiscountDTO> discountDTOs = discounts.stream().map(this::convertToDTO).collect(Collectors.toList());
         return ResponseEntity.ok(Map.of("success", true, "data", discountDTOs));
@@ -73,7 +70,7 @@ public class DiscountController {
         dto.setDiscountId(discount.getDiscountId());
         dto.setDate(discount.getDate());
         dto.setRef(discount.getRef());
-        dto.setClientId(discount.getClientId()); // FIX: String
+        dto.setClientId(discount.getClientId());
         
         if (discount.getClientId() != null) {
             clientRepository.findById(discount.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
