@@ -23,8 +23,9 @@ public class ChatMessage {
     @Column(nullable = false, length = 20)
     private String from;
     
-    @Column(name = "staff_id")
-    private Long staffId;
+    // FIX: Changed from Long to String
+    @Column(name = "staff_id", length = 36)
+    private String staffId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_id", insertable = false, updatable = false)
@@ -40,7 +41,6 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getMessageId() { return messageId; }
@@ -51,8 +51,8 @@ public class ChatMessage {
     public void setChat(Chat chat) { this.chat = chat; }
     public String getFrom() { return from; }
     public void setFrom(String from) { this.from = from; }
-    public Long getStaffId() { return staffId; }
-    public void setStaffId(Long staffId) { this.staffId = staffId; }
+    public String getStaffId() { return staffId; }
+    public void setStaffId(String staffId) { this.staffId = staffId; }
     public Staff getStaff() { return staff; }
     public void setStaff(Staff staff) { this.staff = staff; }
     public String getText() { return text; }
