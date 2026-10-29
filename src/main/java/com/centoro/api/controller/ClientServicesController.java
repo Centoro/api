@@ -16,54 +16,29 @@ public class ClientServicesController {
     private ClientService clientService;
 
     @GetMapping("/{id}/services")
-    public ResponseEntity<?> getClientServices(@PathVariable Long id) {
-        if (!clientService.getClientById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        
+    public ResponseEntity<?> getClientServices(@PathVariable String id) { // FIX: String
+        if (!clientService.getClientById(id).isPresent()) return ResponseEntity.notFound().build();
         List<String> services = clientService.getClientServices(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", services
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", services));
     }
 
     @GetMapping("/{id}/projects")
-    public ResponseEntity<?> getClientProjects(@PathVariable Long id) {
-        if (!clientService.getClientById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        // This reuses the existing ProjectRepository
-        // ProjectsController already handles this via /api/projects/client/{clientId}
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Use /api/projects/client/" + id + " endpoint"
-        ));
+    public ResponseEntity<?> getClientProjects(@PathVariable String id) { // FIX: String
+        if (!clientService.getClientById(id).isPresent()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "message", "Use /api/projects/client/" + id + " endpoint"));
     }
 
     @GetMapping("/{id}/invoices")
-    public ResponseEntity<?> getClientInvoices(@PathVariable Long id) {
-        if (!clientService.getClientById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        // This reuses the existing InvoiceRepository
-        // InvoicesController already handles this via /api/invoices/client/{clientId}
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Use /api/invoices/client/" + id + " endpoint"
-        ));
+    public ResponseEntity<?> getClientInvoices(@PathVariable String id) { // FIX: String
+        if (!clientService.getClientById(id).isPresent()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "message", "Use /api/invoices/client/" + id + " endpoint"));
     }
 
     @PostMapping("/{id}/recalculate")
-    public ResponseEntity<?> recalculateClientStats(@PathVariable Long id) {
+    public ResponseEntity<?> recalculateClientStats(@PathVariable String id) { // FIX: String
         try {
             clientService.updateClientStats(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Client stats recalculated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Client stats recalculated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
