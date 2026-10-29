@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface StaffFileRepository extends JpaRepository<StaffFile, Long> {
     Optional<StaffFile> findByFileId(String fileId);
     
-    // ✅ FIX: Changed from Long to String
+    // ✅ FIX: Must be String, not Long
     List<StaffFile> findByStaffId(String staffId);
     
     List<StaffFile> findByCategory(String category);
