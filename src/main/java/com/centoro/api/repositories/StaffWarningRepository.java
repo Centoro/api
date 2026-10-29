@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface StaffWarningRepository extends JpaRepository<StaffWarning, Long> {
-    List<StaffWarning> findByStaffId(Long staffId);
+    // ✅ FIX: Changed from Long to String
+    List<StaffWarning> findByStaffId(String staffId);
 }
