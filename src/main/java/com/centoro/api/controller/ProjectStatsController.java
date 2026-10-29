@@ -17,20 +17,14 @@ public class ProjectStatsController {
     @GetMapping
     public ResponseEntity<?> getProjectStats() {
         Map<String, Object> stats = projectService.getProjectStats();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @GetMapping("/profit/{projectId}")
-    public ResponseEntity<?> getProjectProfitability(@PathVariable Long projectId) {
+    public ResponseEntity<?> getProjectProfitability(@PathVariable String projectId) { // FIX: String
         try {
             Map<String, Object> profitability = projectService.getProjectProfitability(projectId);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", profitability
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", profitability));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
