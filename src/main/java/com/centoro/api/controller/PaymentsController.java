@@ -37,7 +37,7 @@ public class PaymentsController {
     }
 
     @GetMapping("/invoice/{invoiceId}")
-    public ResponseEntity<?> getPaymentsByInvoice(@PathVariable String invoiceId) { // FIX: String
+    public ResponseEntity<?> getPaymentsByInvoice(@PathVariable String invoiceId) {
         List<Payment> payments = paymentRepository.findByInvoiceId(invoiceId);
         return ResponseEntity.ok(Map.of("success", true, "data", payments));
     }
@@ -45,7 +45,7 @@ public class PaymentsController {
     @PostMapping
     public ResponseEntity<?> createPayment(@RequestBody Payment payment) {
         if (payment.getInvoiceId() != null) {
-            Optional<Invoice> invoiceOpt = invoiceRepository.findById(payment.getInvoiceId()); // FIX: String
+            Optional<Invoice> invoiceOpt = invoiceRepository.findById(payment.getInvoiceId());
             if (invoiceOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invoice not found"));
             }
@@ -60,7 +60,6 @@ public class PaymentsController {
         payment.setCreatedAt(new Date());
         if (payment.getMethod() == null) payment.setMethod("EFT");
         if (payment.getSource() == null) payment.setSource("invoice");
-        
         Payment saved = paymentRepository.save(payment);
         return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Payment recorded successfully"));
     }
