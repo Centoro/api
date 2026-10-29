@@ -7,13 +7,12 @@ public class ChatMessageDTO {
     private String messageId;
     private Long chatId;
     private String from;
-    private Long staffId;
+    private String staffId;  // FIX
     private String staffName;
     private String text;
     private String attachment;
     private Date createdAt;
-    
-    // Getters and Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getMessageId() { return messageId; }
@@ -22,8 +21,8 @@ public class ChatMessageDTO {
     public void setChatId(Long chatId) { this.chatId = chatId; }
     public String getFrom() { return from; }
     public void setFrom(String from) { this.from = from; }
-    public Long getStaffId() { return staffId; }
-    public void setStaffId(Long staffId) { this.staffId = staffId; }
+    public String getStaffId() { return staffId; }
+    public void setStaffId(String staffId) { this.staffId = staffId; }
     public String getStaffName() { return staffName; }
     public void setStaffName(String staffName) { this.staffName = staffName; }
     public String getText() { return text; }
