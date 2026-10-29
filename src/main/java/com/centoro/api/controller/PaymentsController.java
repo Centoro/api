@@ -26,83 +26,49 @@ public class PaymentsController {
     @GetMapping
     public ResponseEntity<?> getAllPayments() {
         List<Payment> payments = paymentRepository.findAll();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", payments
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", payments));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPayment(@PathVariable Long id) {
         Optional<Payment> payment = paymentRepository.findById(id);
-        if (payment.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", payment.get()
-        ));
+        if (payment.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", payment.get()));
     }
 
     @GetMapping("/invoice/{invoiceId}")
-    public ResponseEntity<?> getPaymentsByInvoice(@PathVariable Long invoiceId) {
+    public ResponseEntity<?> getPaymentsByInvoice(@PathVariable String invoiceId) { // FIX: String
         List<Payment> payments = paymentRepository.findByInvoiceId(invoiceId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", payments
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", payments));
     }
 
     @PostMapping
     public ResponseEntity<?> createPayment(@RequestBody Payment payment) {
-        // Validate invoice exists
         if (payment.getInvoiceId() != null) {
-            Optional<Invoice> invoiceOpt = invoiceRepository.findById(payment.getInvoiceId());
+            Optional<Invoice> invoiceOpt = invoiceRepository.findById(payment.getInvoiceId()); // FIX: String
             if (invoiceOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Invoice not found"
-                ));
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invoice not found"));
             }
-            
-            // Update invoice paid amount
             Invoice invoice = invoiceOpt.get();
             invoice.setPaid(invoice.getPaid() + payment.getAmount());
-            
-            if (invoice.getPaid() >= invoice.getTotal()) {
-                invoice.setStatus(Invoice.InvoiceStatus.paid);
-            } else if (invoice.getPaid() > 0) {
-                invoice.setStatus(Invoice.InvoiceStatus.partial);
-            }
+            if (invoice.getPaid() >= invoice.getTotal()) invoice.setStatus(Invoice.InvoiceStatus.paid);
+            else if (invoice.getPaid() > 0) invoice.setStatus(Invoice.InvoiceStatus.partial);
             invoice.setUpdatedAt(new Date());
             invoiceRepository.save(invoice);
         }
-        
-        // Generate payment ID
         payment.setPaymentId("PAY-" + String.format("%04d", System.currentTimeMillis() % 10000));
         payment.setCreatedAt(new Date());
-        
         if (payment.getMethod() == null) payment.setMethod("EFT");
         if (payment.getSource() == null) payment.setSource("invoice");
         
         Payment saved = paymentRepository.save(payment);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Payment recorded successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Payment recorded successfully"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePayment(@PathVariable Long id) {
-        if (!paymentRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        
+        if (!paymentRepository.existsById(id)) return ResponseEntity.notFound().build();
         paymentRepository.deleteById(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Payment deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Payment deleted successfully"));
     }
 }
