@@ -8,7 +8,10 @@ import java.util.Optional;
 
 public interface PayrollRecordRepository extends JpaRepository<PayrollRecord, Long> {
     Optional<PayrollRecord> findByRecordId(String recordId);
-    List<PayrollRecord> findByStaffId(Long staffId);
+    
+    // ✅ FIX: Changed from Long to String
+    List<PayrollRecord> findByStaffId(String staffId);
+    
     List<PayrollRecord> findByPeriod(String period);
     List<PayrollRecord> findByPeriodAndStatus(String period, String status);
     List<PayrollRecord> findByPeriodOrderByStaffIdAsc(String period);
