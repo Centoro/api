@@ -13,10 +13,10 @@ import java.util.Optional;
 @RequestMapping("/api/staff/files")
 @CrossOrigin(origins = "*")
 public class StaffFileController {
-
+    
     @Autowired
     private StaffFileService staffFileService;
-
+    
     @GetMapping
     public ResponseEntity<?> getAllFiles() {
         List<StaffFile> files = staffFileService.getAllFiles();
@@ -25,16 +25,17 @@ public class StaffFileController {
             "data", files
         ));
     }
-
+    
+    // ✅ FIX: Changed @PathVariable from Long to String
     @GetMapping("/staff/{staffId}")
-    public ResponseEntity<?> getFilesByStaff(@PathVariable Long staffId) {
+    public ResponseEntity<?> getFilesByStaff(@PathVariable String staffId) {
         List<StaffFile> files = staffFileService.getFilesByStaff(staffId);
         return ResponseEntity.ok(Map.of(
             "success", true,
             "data", files
         ));
     }
-
+    
     @GetMapping("/category/{category}")
     public ResponseEntity<?> getFilesByCategory(@PathVariable String category) {
         List<StaffFile> files = staffFileService.getFilesByCategory(category);
@@ -43,7 +44,7 @@ public class StaffFileController {
             "data", files
         ));
     }
-
+    
     @GetMapping("/{id}")
     public ResponseEntity<?> getFile(@PathVariable Long id) {
         Optional<StaffFile> fileOpt = staffFileService.getFileById(id);
@@ -55,7 +56,7 @@ public class StaffFileController {
             "data", fileOpt.get()
         ));
     }
-
+    
     @PostMapping
     public ResponseEntity<?> createFile(@RequestBody StaffFile file) {
         if (file.getStaffId() == null) {
@@ -71,7 +72,7 @@ public class StaffFileController {
             "message", "File uploaded successfully"
         ));
     }
-
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFile(@PathVariable Long id) {
         if (!staffFileService.getFileById(id).isPresent()) {
