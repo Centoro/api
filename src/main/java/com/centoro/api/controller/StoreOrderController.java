@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -61,7 +60,8 @@ public class StoreOrderController {
         Invoice invoice = new Invoice();
         invoice.setInvoiceId("WEB-INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         invoice.setTrackingNumber(invoice.getInvoiceId());
-        invoice.setClientId(client.getId());
+        // FIX: client.getId() is now a String (UUID). Removed the implicit Long cast.
+        invoice.setClientId(client.getId()); 
         invoice.setService("Website store - " + item);
         invoice.setItems("[{\"item\":\"" + escape(item) + "\",\"license\":\"" + escape(license) + "\"}]");
         invoice.setSubtotal(amount);
@@ -82,7 +82,8 @@ public class StoreOrderController {
 
     @PostMapping("/{invoiceId}/confirm")
     @Transactional
-    public ResponseEntity<?> confirmOrder(@PathVariable Long invoiceId, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> confirmOrder(@PathVariable String invoiceId, @RequestBody Map<String, Object> request) {
+        // FIX: @PathVariable changed from Long to String
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null) return ResponseEntity.notFound().build();
         if (invoice.getStatus() == Invoice.InvoiceStatus.paid) return ResponseEntity.ok(Map.of("success", true, "message", "Order already confirmed"));
@@ -106,7 +107,7 @@ public class StoreOrderController {
         Contract contract = new Contract();
         contract.setName("Instrumental " + invoice.getService() + " - " + text(request.getOrDefault("license", "lease")));
         contract.setCategory("Music License");
-        contract.setIssuedTo("{\"clientId\":" + invoice.getClientId() + ",\"invoiceId\":" + invoice.getId() + "}");
+        contract.setIssuedTo("{\"clientId\":\"" + invoice.getClientId() + "\",\"invoiceId\":\"" + invoice.getId() + "\"}");
         contract.setUploadedAt(new Date());
         contract.setFileUrl("/api/store/orders/" + invoice.getId() + "/contract");
         Contract savedContract = contractService.createContract(contract);
@@ -117,7 +118,8 @@ public class StoreOrderController {
     }
 
     @GetMapping(value = "/{invoiceId}/contract", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> contract(@PathVariable Long invoiceId) {
+    public ResponseEntity<String> contract(@PathVariable String invoiceId) {
+        // FIX: @PathVariable changed from Long to String
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null || invoice.getStatus() != Invoice.InvoiceStatus.paid) return ResponseEntity.notFound().build();
         return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\n" +
