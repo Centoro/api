@@ -26,51 +26,31 @@ public class EmailController {
     @Autowired
     private ClientRepository clientRepository;
 
-    // ============ ACCOUNTS ============
-    
     @GetMapping("/accounts")
     public ResponseEntity<?> getAllAccounts() {
         List<EmailAccount> accounts = emailService.getAllAccounts();
-        List<EmailAccountDTO> accountDTOs = accounts.stream()
-            .map(this::convertAccountToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", accountDTOs
-        ));
+        List<EmailAccountDTO> accountDTOs = accounts.stream().map(this::convertAccountToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", accountDTOs));
     }
 
     @GetMapping("/accounts/{id}")
     public ResponseEntity<?> getAccount(@PathVariable Long id) {
         Optional<EmailAccount> accountOpt = emailService.getAccountById(id);
-        if (accountOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertAccountToDTO(accountOpt.get())
-        ));
+        if (accountOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(accountOpt.get())));
     }
 
     @PostMapping("/accounts")
     public ResponseEntity<?> createAccount(@RequestBody EmailAccount account) {
         EmailAccount saved = emailService.createAccount(account);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertAccountToDTO(saved),
-            "message", "Email account connected successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(saved), "message", "Email account connected successfully"));
     }
 
     @PutMapping("/accounts/{id}")
     public ResponseEntity<?> updateAccount(@PathVariable Long id, @RequestBody EmailAccount account) {
         try {
             EmailAccount updated = emailService.updateAccount(id, account);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", convertAccountToDTO(updated),
-                "message", "Email account updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(updated), "message", "Email account updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -78,118 +58,55 @@ public class EmailController {
 
     @DeleteMapping("/accounts/{id}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
-        if (!emailService.getAccountById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (!emailService.getAccountById(id).isPresent()) return ResponseEntity.notFound().build();
         emailService.deleteAccount(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Email account disconnected successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Email account disconnected successfully"));
     }
 
-    // ============ CAMPAIGNS / SENT EMAILS ============
-    
     @GetMapping("/campaigns")
     public ResponseEntity<?> getAllCampaigns() {
         List<EmailCampaign> campaigns = emailService.getAllCampaigns();
-        List<EmailCampaignDTO> campaignDTOs = campaigns.stream()
-            .map(this::convertCampaignToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", campaignDTOs
-        ));
+        List<EmailCampaignDTO> campaignDTOs = campaigns.stream().map(this::convertCampaignToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", campaignDTOs));
     }
 
     @GetMapping("/campaigns/{id}")
     public ResponseEntity<?> getCampaign(@PathVariable Long id) {
         Optional<EmailCampaign> campaignOpt = emailService.getCampaignById(id);
-        if (campaignOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertCampaignToDTO(campaignOpt.get())
-        ));
+        if (campaignOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", convertCampaignToDTO(campaignOpt.get())));
     }
 
-    // ============ SEND EMAIL ============
-    
     @PostMapping("/send")
     public ResponseEntity<?> sendEmail(@RequestBody SendEmailRequest request) {
-        if (request.getAccountId() == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Account ID is required"
-            ));
+        if (request.getAccountId() == null || request.getClientId() == null || request.getSubject() == null || request.getBody() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Missing required fields"));
         }
-        if (request.getClientId() == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Client ID is required"
-            ));
-        }
-        if (request.getSubject() == null || request.getSubject().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Subject is required"
-            ));
-        }
-        if (request.getBody() == null || request.getBody().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Email body is required"
-            ));
-        }
-        
         try {
             EmailCampaign saved = emailService.sendEmail(request);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", convertCampaignToDTO(saved),
-                "message", "Email sent successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", convertCampaignToDTO(saved), "message", "Email sent successfully"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Failed to send email: " + e.getMessage()
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Failed to send email: " + e.getMessage()));
         }
     }
 
     @DeleteMapping("/campaigns/{id}")
     public ResponseEntity<?> deleteCampaign(@PathVariable Long id) {
-        if (!emailService.getCampaignById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (!emailService.getCampaignById(id).isPresent()) return ResponseEntity.notFound().build();
         emailService.deleteCampaign(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Email campaign deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Email campaign deleted successfully"));
     }
 
-    // ============ CLIENT SERVICES ============
-    
     @GetMapping("/clients/{clientId}/services")
-    public ResponseEntity<?> getClientServices(@PathVariable Long clientId) {
+    public ResponseEntity<?> getClientServices(@PathVariable String clientId) {
+        // FIX: clientId is String now
         if (!clientRepository.existsById(clientId)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Client not found"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
         }
-        
         List<String> services = emailService.getClientServices(clientId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", services
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", services));
     }
 
-    // ============ CONVERTERS ============
-    
     private EmailAccountDTO convertAccountToDTO(EmailAccount account) {
         EmailAccountDTO dto = new EmailAccountDTO();
         dto.setId(account.getId());
