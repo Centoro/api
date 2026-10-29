@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface StaffBonusRepository extends JpaRepository<StaffBonus, Long> {
-    List<StaffBonus> findByStaffId(Long staffId);
-    List<StaffBonus> findByStatus(String status);
+    // ✅ FIX: This MUST be String to match the Controller and Database
+    List<StaffBonus> findByStaffId(String staffId);
 }
