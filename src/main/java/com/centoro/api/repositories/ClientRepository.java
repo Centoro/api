@@ -3,28 +3,29 @@ package com.centoro.api.repositories;
 import com.centoro.api.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface ClientRepository extends JpaRepository<Client, Long> {
+@Repository
+public interface ClientRepository extends JpaRepository<Client, String> {
     
-    Optional<Client> findByClientId(String clientId);
+    // FIX: Changed from Long to String for the ID type
+    
     Optional<Client> findByCode(String code);
-    Optional<Client> findByEmail(String email);
-    Optional<Client> findByPhone(String phone);
     
-    List<Client> findByNameContainingIgnoreCase(String name);
+    Optional<Client> findByEmail(String email);
+    
     List<Client> findByStatus(Client.ClientStatus status);
-    List<Client> findByCompanyNameContainingIgnoreCase(String companyName);
     
     @Query("SELECT c FROM Client c WHERE c.deletedAt IS NULL")
     List<Client> findAllActive();
     
-    @Query("SELECT c FROM Client c WHERE c.deletedAt IS NOT NULL")
-    List<Client> findAllDeleted();
-    
-    boolean existsByClientId(String clientId);
-    boolean existsByCode(String code);
-    boolean existsByEmail(String email);
+    @Query("SELECT c FROM Client c WHERE c.deletedAt IS NULL AND " +
+           "(LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.code) LIKE LOWER(CONCAT('%', :query, '%')))")
+    List<Client> searchClients(@Param("query") String query);
 }
-
