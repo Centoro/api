@@ -46,7 +46,8 @@ public class ChatService {
         return chatRepository.findOpenChats();
     }
     
-    public List<Chat> getChatsByClient(Long clientId) {
+    // FIX: Changed from Long to String
+    public List<Chat> getChatsByClient(String clientId) {
         return chatRepository.findByClientId(clientId);
     }
     
