@@ -28,12 +28,14 @@ public class EmailService {
 
     public List<EmailAccount> getAllAccounts() { return emailAccountRepository.findAll(); }
     public Optional<EmailAccount> getAccountById(Long id) { return emailAccountRepository.findById(id); }
+
     public EmailAccount createAccount(EmailAccount account) {
         account.setAccountId("EAC-" + UUID.randomUUID().toString().substring(0, 6));
         account.setCreatedAt(new Date());
-        if(account.getStatus() == null) account.setStatus("connected");
+        if (account.getStatus() == null) account.setStatus("connected");
         return emailAccountRepository.save(account);
     }
+
     public EmailAccount updateAccount(Long id, EmailAccount account) {
         EmailAccount existing = emailAccountRepository.findById(id).orElseThrow();
         existing.setLabel(account.getLabel());
@@ -42,6 +44,7 @@ public class EmailService {
         existing.setUpdatedAt(new Date());
         return emailAccountRepository.save(existing);
     }
+
     public void deleteAccount(Long id) { emailAccountRepository.deleteById(id); }
 
     public List<EmailCampaign> getAllCampaigns() { return emailCampaignRepository.findAll(); }
@@ -49,7 +52,8 @@ public class EmailService {
     public void deleteCampaign(Long id) { emailCampaignRepository.deleteById(id); }
 
     public EmailCampaign sendEmail(SendEmailRequest request) {
-        Client client = clientRepository.findById(request.getClientId()).orElseThrow(() -> new RuntimeException("Client not found")); // FIX: String
+        // FIX: request.getClientId() is now String
+        Client client = clientRepository.findById(request.getClientId()).orElseThrow(() -> new RuntimeException("Client not found"));
         EmailAccount account = emailAccountRepository.findById(request.getAccountId()).orElseThrow(() -> new RuntimeException("Email account not found"));
         
         EmailCampaign campaign = new EmailCampaign();
@@ -63,11 +67,12 @@ public class EmailService {
         campaign.setSentAt(new Date());
         campaign.setCreatedAt(new Date());
         
-        // Actual sending logic would go here
+        // Actual sending logic goes here
         
         return emailCampaignRepository.save(campaign);
     }
 
+    // FIX: Changed from Long to String
     public List<String> getClientServices(String clientId) {
         return List.of("General Service", "Consultation"); // Placeholder logic
     }
