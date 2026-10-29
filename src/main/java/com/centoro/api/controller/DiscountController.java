@@ -26,58 +26,35 @@ public class DiscountController {
     @GetMapping
     public ResponseEntity<?> getAllDiscounts() {
         List<Discount> discounts = discountService.getAllDiscounts();
-        List<DiscountDTO> discountDTOs = discounts.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", discountDTOs
-        ));
+        List<DiscountDTO> discountDTOs = discounts.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", discountDTOs));
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getDiscountsByClient(@PathVariable Long clientId) {
+    public ResponseEntity<?> getDiscountsByClient(@PathVariable String clientId) { // FIX: String
         List<Discount> discounts = discountService.getDiscountsByClient(clientId);
-        List<DiscountDTO> discountDTOs = discounts.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", discountDTOs
-        ));
+        List<DiscountDTO> discountDTOs = discounts.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", discountDTOs));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getDiscount(@PathVariable Long id) {
         Optional<Discount> discountOpt = discountService.getDiscountById(id);
-        if (discountOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertToDTO(discountOpt.get())
-        ));
+        if (discountOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(discountOpt.get())));
     }
 
     @PostMapping
     public ResponseEntity<?> createDiscount(@RequestBody Discount discount) {
         Discount saved = discountService.createDiscount(discount);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertToDTO(saved),
-            "message", "Discount created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(saved), "message", "Discount created successfully"));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDiscount(@PathVariable Long id, @RequestBody Discount discount) {
         try {
             Discount updated = discountService.updateDiscount(id, discount);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", convertToDTO(updated),
-                "message", "Discount updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(updated), "message", "Discount updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -85,14 +62,9 @@ public class DiscountController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDiscount(@PathVariable Long id) {
-        if (!discountService.getDiscountById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (!discountService.getDiscountById(id).isPresent()) return ResponseEntity.notFound().build();
         discountService.deleteDiscount(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Discount deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Discount deleted successfully"));
     }
 
     private DiscountDTO convertToDTO(Discount discount) {
@@ -101,11 +73,10 @@ public class DiscountController {
         dto.setDiscountId(discount.getDiscountId());
         dto.setDate(discount.getDate());
         dto.setRef(discount.getRef());
-        dto.setClientId(discount.getClientId());
+        dto.setClientId(discount.getClientId()); // FIX: String
         
         if (discount.getClientId() != null) {
-            clientRepository.findById(discount.getClientId())
-                .ifPresent(c -> dto.setClientName(c.getName()));
+            clientRepository.findById(discount.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
         }
         
         dto.setDescription(discount.getDescription());
