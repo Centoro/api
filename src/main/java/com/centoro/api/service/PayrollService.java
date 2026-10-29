@@ -94,7 +94,7 @@ public class PayrollService {
             
             PayrollRecord record = new PayrollRecord();
             record.setRecordId("PR-" + String.format("%04d", System.currentTimeMillis() % 10000));
-            record.setStaffId(staff.getId());
+            record.setStaffId(staff.getId()); // Now both are String
             record.setPeriod(period);
             record.setGross(gross);
             record.setPaye(paye);
@@ -157,7 +157,7 @@ public class PayrollService {
         return summary;
     }
     
-    // FIX: Changed from Long to String to match UUID format
+    // FIX: Changed parameter from Long to String
     public List<PayrollRecord> getStaffPayrollHistory(String staffId) {
         return payrollRecordRepository.findByStaffId(staffId);
     }
