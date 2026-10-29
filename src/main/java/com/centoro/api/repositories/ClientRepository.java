@@ -11,13 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, String> {
-    
-    // FIX: Changed from Long to String for the ID type
-    
     Optional<Client> findByCode(String code);
-    
     Optional<Client> findByEmail(String email);
-    
     List<Client> findByStatus(Client.ClientStatus status);
     
     @Query("SELECT c FROM Client c WHERE c.deletedAt IS NULL")
