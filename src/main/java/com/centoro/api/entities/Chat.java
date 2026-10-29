@@ -14,8 +14,9 @@ public class Chat {
     @Column(name = "chat_id", unique = true, nullable = false, length = 50)
     private String chatId;
     
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    // FIX: Changed from Long to String
+    @Column(name = "client_id", nullable = false, length = 36)
+    private String clientId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", insertable = false, updatable = false)
@@ -48,13 +49,12 @@ public class Chat {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messages;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getChatId() { return chatId; }
     public void setChatId(String chatId) { this.chatId = chatId; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     public String getSubject() { return subject; }
