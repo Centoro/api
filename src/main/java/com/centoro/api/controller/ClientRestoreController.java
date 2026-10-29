@@ -15,26 +15,20 @@ public class ClientRestoreController {
     private ClientService clientService;
 
     @PostMapping("/{id}/restore")
-    public ResponseEntity<?> restoreClient(@PathVariable Long id) {
+    public ResponseEntity<?> restoreClient(@PathVariable String id) {
         try {
             clientService.restoreClient(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Client restored successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Client restored successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}/permanent")
-    public ResponseEntity<?> hardDeleteClient(@PathVariable Long id) {
+    public ResponseEntity<?> hardDeleteClient(@PathVariable String id) {
         try {
             clientService.hardDeleteClient(id);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Client permanently deleted"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Client permanently deleted"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
