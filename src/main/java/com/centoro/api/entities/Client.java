@@ -7,7 +7,6 @@ import java.util.Date;
 @Table(name = "clients")
 public class Client {
     
-    // FIX: Changed from Long to String to match the char(36) UUID in MySQL
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36)
@@ -84,7 +83,6 @@ public class Client {
         active, inactive
     }
     
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getClientId() { return clientId; }
