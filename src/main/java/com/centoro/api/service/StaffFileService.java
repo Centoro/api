@@ -19,7 +19,7 @@ public class StaffFileService {
         return staffFileRepository.findAll();
     }
 
-    // ✅ FIX: This correctly uses String to match the Staff entity
+    // ✅ CRITICAL FIX: Must be String
     public List<StaffFile> getFilesByStaff(String staffId) {
         return staffFileRepository.findByStaffId(staffId);
     }
@@ -35,7 +35,7 @@ public class StaffFileService {
     public StaffFile createFile(StaffFile file) {
         file.setFileId("FILE-" + System.currentTimeMillis());
         file.setCreatedAt(new Date());
-        file.setUpdatedAt(new Date());
+        file.setUpdatedAt(new Date()); // This now works because we added it to the Entity
         return staffFileRepository.save(file);
     }
 
