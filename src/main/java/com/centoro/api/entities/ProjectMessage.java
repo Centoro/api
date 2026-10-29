@@ -13,11 +13,13 @@ public class ProjectMessage {
     @Column(name = "message_id", unique = true, nullable = false, length = 50)
     private String messageId;
     
-    @Column(name = "project_id", nullable = false)
-    private Long projectId;
+    // FIX: Changed from Long to String to match Project.id (UUID)
+    @Column(name = "project_id", nullable = false, length = 36)
+    private String projectId;
     
-    @Column(name = "staff_id")
-    private Long staffId;
+    // FIX: Changed from Long to String to match Staff.id (UUID)
+    @Column(name = "staff_id", length = 36)
+    private String staffId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_id", insertable = false, updatable = false)
@@ -44,10 +46,10 @@ public class ProjectMessage {
     public void setId(Long id) { this.id = id; }
     public String getMessageId() { return messageId; }
     public void setMessageId(String messageId) { this.messageId = messageId; }
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
-    public Long getStaffId() { return staffId; }
-    public void setStaffId(Long staffId) { this.staffId = staffId; }
+    public String getProjectId() { return projectId; }
+    public void setProjectId(String projectId) { this.projectId = projectId; }
+    public String getStaffId() { return staffId; }
+    public void setStaffId(String staffId) { this.staffId = staffId; }
     public Staff getStaff() { return staff; }
     public void setStaff(Staff staff) { this.staff = staff; }
     public String getText() { return text; }
