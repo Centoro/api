@@ -13,11 +13,11 @@ public class StaffFile {
     @Column(name = "file_id", unique = true, nullable = false, length = 50)
     private String fileId;
 
-    // ✅ FIX: Changed from Long to String
+    // ✅ CRITICAL FIX: Must be String to match Staff.id
     @Column(name = "staff_id", length = 36)
     private String staffId;
 
-    @Column(length = 100)
+    @Column(length = 255)
     private String name;
 
     @Column(length = 100)
@@ -30,18 +30,33 @@ public class StaffFile {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    // ✅ CRITICAL FIX: Added so StaffFileService can call setUpdatedAt()
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
     public String getFileId() { return fileId; }
     public void setFileId(String fileId) { this.fileId = fileId; }
+
     public String getStaffId() { return staffId; }
     public void setStaffId(String staffId) { this.staffId = staffId; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
     public String getFileUrl() { return fileUrl; }
     public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public Date getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
 }
