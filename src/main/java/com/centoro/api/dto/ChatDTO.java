@@ -6,7 +6,7 @@ import java.util.List;
 public class ChatDTO {
     private Long id;
     private String chatId;
-    private String clientId;  // FIX
+    private String clientId;
     private String clientName;
     private String subject;
     private String status;
