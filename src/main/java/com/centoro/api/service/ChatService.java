@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Service
 public class ChatService {
-    
+
     private final ChatRepository chatRepository;
     private final ChatMessageRepository messageRepository;
 
@@ -20,7 +20,7 @@ public class ChatService {
         this.chatRepository = chatRepository;
         this.messageRepository = messageRepository;
     }
-    
+
     @Transactional
     public Chat createChat(Chat chat) {
         chat.setChatId("CHT-" + String.format("%04d", System.currentTimeMillis() % 10000));
@@ -30,39 +30,21 @@ public class ChatService {
         if (chat.getPriority() == null) chat.setPriority("medium");
         return chatRepository.save(chat);
     }
-    
+
     @Transactional
     public ChatMessage addMessage(ChatMessage message) {
         message.setMessageId("MSG-" + String.format("%04d", System.currentTimeMillis() % 10000));
         message.setCreatedAt(new Date());
         return messageRepository.save(message);
     }
-    
-    public List<Chat> getAllChats() {
-        return chatRepository.findAll();
-    }
-    
-    public List<Chat> getOpenChats() {
-        return chatRepository.findOpenChats();
-    }
-    
-    // FIX: Changed from Long to String
-    public List<Chat> getChatsByClient(String clientId) {
-        return chatRepository.findByClientId(clientId);
-    }
-    
-    public Optional<Chat> getChatById(Long id) {
-        return chatRepository.findById(id);
-    }
-    
-    public Optional<Chat> getChatByChatId(String chatId) {
-        return chatRepository.findByChatId(chatId);
-    }
-    
-    public List<ChatMessage> getMessages(Long chatId) {
-        return messageRepository.findByChatIdOrderByCreatedAtAsc(chatId);
-    }
-    
+
+    public List<Chat> getAllChats() { return chatRepository.findAll(); }
+    public List<Chat> getOpenChats() { return chatRepository.findOpenChats(); }
+    public List<Chat> getChatsByClient(String clientId) { return chatRepository.findByClientId(clientId); }
+    public Optional<Chat> getChatById(Long id) { return chatRepository.findById(id); }
+    public Optional<Chat> getChatByChatId(String chatId) { return chatRepository.findByChatId(chatId); }
+    public List<ChatMessage> getMessages(Long chatId) { return messageRepository.findByChatIdOrderByCreatedAtAsc(chatId); }
+
     @Transactional
     public Chat updateChatStatus(Long id, String status) {
         Chat chat = chatRepository.findById(id).orElseThrow();
@@ -70,9 +52,7 @@ public class ChatService {
         chat.setUpdatedAt(new Date());
         return chatRepository.save(chat);
     }
-    
+
     @Transactional
-    public void deleteChat(Long id) {
-        chatRepository.deleteById(id);
-    }
+    public void deleteChat(Long id) { chatRepository.deleteById(id); }
 }
