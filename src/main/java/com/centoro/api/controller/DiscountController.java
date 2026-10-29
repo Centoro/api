@@ -70,7 +70,7 @@ public class DiscountController {
         dto.setDiscountId(discount.getDiscountId());
         dto.setDate(discount.getDate());
         dto.setRef(discount.getRef());
-        dto.setClientId(discount.getClientId());
+        dto.setClientId(discount.getClientId()); // String
         
         if (discount.getClientId() != null) {
             clientRepository.findById(discount.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
