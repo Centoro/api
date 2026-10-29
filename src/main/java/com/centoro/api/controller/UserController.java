@@ -18,19 +18,15 @@ public class UserController {
     }
     
     @GetMapping 
-    public List<User> getAllUsers() { 
-        return userRepository.findAll(); 
-    }
+    public List<User> getAllUsers() { return userRepository.findAll(); }
     
     @GetMapping("/{id}") 
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable String id) { // FIX: String
         return userRepository.findById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     @PostMapping 
-    public User createUser(@RequestBody User user) { 
-        return userRepository.save(user); 
-    }
+    public User createUser(@RequestBody User user) { return userRepository.save(user); }
 }
