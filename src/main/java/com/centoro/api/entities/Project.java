@@ -8,8 +8,9 @@ import java.util.Date;
 public class Project {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36)
+    private String id;
     
     @Column(name = "project_id", unique = true, nullable = false, length = 50)
     private String projectId;
@@ -20,8 +21,9 @@ public class Project {
     @Column(nullable = false)
     private String name;
     
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    // FIX: Changed from Long to String
+    @Column(name = "client_id", nullable = false, length = 36)
+    private String clientId;
     
     @Column(length = 255)
     private String service;
@@ -67,17 +69,16 @@ public class Project {
         planning, in_progress, completed
     }
     
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getProjectId() { return projectId; }
     public void setProjectId(String projectId) { this.projectId = projectId; }
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getService() { return service; }
     public void setService(String service) { this.service = service; }
     public Double getBudget() { return budget; }
