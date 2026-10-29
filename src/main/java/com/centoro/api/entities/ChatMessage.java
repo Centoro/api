@@ -9,38 +9,37 @@ public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "message_id", unique = true, nullable = false, length = 50)
     private String messageId;
-    
+
     @Column(name = "chat_id", nullable = false)
     private Long chatId;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", insertable = false, updatable = false)
     private Chat chat;
-    
+
     @Column(nullable = false, length = 20)
     private String from;
-    
-    // FIX: Changed from Long to String
+
     @Column(name = "staff_id", length = 36)
     private String staffId;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_id", insertable = false, updatable = false)
     private Staff staff;
-    
+
     @Column(columnDefinition = "TEXT")
     private String text;
-    
+
     @Column(columnDefinition = "JSON")
     private String attachment;
-    
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getMessageId() { return messageId; }
