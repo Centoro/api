@@ -157,7 +157,8 @@ public class PayrollService {
         return summary;
     }
     
-    public List<PayrollRecord> getStaffPayrollHistory(Long staffId) {
+    // FIX: Changed from Long to String to match UUID format
+    public List<PayrollRecord> getStaffPayrollHistory(String staffId) {
         return payrollRecordRepository.findByStaffId(staffId);
     }
 }
