@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -26,8 +25,7 @@ public class StoreOrderController {
     private final PaymentRepository paymentRepository;
     private final ContractService contractService;
 
-    public StoreOrderController(ClientService clientService, InvoiceRepository invoiceRepository,
-                                PaymentRepository paymentRepository, ContractService contractService) {
+    public StoreOrderController(ClientService clientService, InvoiceRepository invoiceRepository, PaymentRepository paymentRepository, ContractService contractService) {
         this.clientService = clientService;
         this.invoiceRepository = invoiceRepository;
         this.paymentRepository = paymentRepository;
@@ -43,8 +41,9 @@ public class StoreOrderController {
         String item = text(request.get("item"));
         String license = text(request.get("license"));
         Double amount = number(request.get("amount"));
+        
         if (name.isBlank() || email.isBlank() || item.isBlank() || amount == null || amount < 0) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Name, email, item and amount are required"));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Required fields missing"));
         }
 
         Client client = clientService.getClientByEmail(email).orElseGet(() -> {
@@ -60,8 +59,7 @@ public class StoreOrderController {
         Invoice invoice = new Invoice();
         invoice.setInvoiceId("WEB-INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         invoice.setTrackingNumber(invoice.getInvoiceId());
-        // FIX: client.getId() is now a String (UUID). Removed the implicit Long cast.
-        invoice.setClientId(client.getId()); 
+        invoice.setClientId(client.getId()); // FIX: String
         invoice.setService("Website store - " + item);
         invoice.setItems("[{\"item\":\"" + escape(item) + "\",\"license\":\"" + escape(license) + "\"}]");
         invoice.setSubtotal(amount);
@@ -76,20 +74,19 @@ public class StoreOrderController {
 
         return ResponseEntity.ok(Map.of("success", true, "status", "payment_pending", "data", Map.of(
             "invoiceId", saved.getId(), "invoiceNumber", saved.getInvoiceId(), "clientId", client.getId(), "amount", amount,
-            "message", "Order recorded. Complete payment with the configured payment provider."
+            "message", "Order recorded."
         )));
     }
 
     @PostMapping("/{invoiceId}/confirm")
     @Transactional
-    public ResponseEntity<?> confirmOrder(@PathVariable String invoiceId, @RequestBody Map<String, Object> request) {
-        // FIX: @PathVariable changed from Long to String
+    public ResponseEntity<?> confirmOrder(@PathVariable String invoiceId, @RequestBody Map<String, Object> request) { // FIX: String
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null) return ResponseEntity.notFound().build();
         if (invoice.getStatus() == Invoice.InvoiceStatus.paid) return ResponseEntity.ok(Map.of("success", true, "message", "Order already confirmed"));
 
         Payment payment = new Payment();
-        payment.setInvoiceId(invoice.getId());
+        payment.setInvoiceId(invoice.getId()); // FIX: String
         payment.setAmount(invoice.getTotal());
         payment.setMethod(text(request.getOrDefault("method", "online")));
         payment.setReference(text(request.getOrDefault("reference", "website-checkout")));
@@ -118,18 +115,7 @@ public class StoreOrderController {
     }
 
     @GetMapping(value = "/{invoiceId}/contract", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> contract(@PathVariable String invoiceId) {
-        // FIX: @PathVariable changed from Long to String
+    public ResponseEntity<String> contract(@PathVariable String invoiceId) { // FIX: String
         Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
         if (invoice == null || invoice.getStatus() != Invoice.InvoiceStatus.paid) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\n" +
-            "Invoice: " + invoice.getInvoiceId() + "\n" +
-            "Item: " + invoice.getService() + "\n" +
-            "Status: PAID\n\n" +
-            "This license is issued to the customer recorded against the invoice.\n");
-    }
-
-    private static String text(Object value) { return value == null ? "" : String.valueOf(value).trim(); }
-    private static Double number(Object value) { try { return value == null ? null : Double.valueOf(String.valueOf(value)); } catch (NumberFormatException e) { return null; } }
-    private static String escape(String value) { return value.replace("\\", "\\\\").replace("\"", "\\\""); }
-}
+        return ResponseEntity.ok("CENTORO ENTERPRISE MUSIC LICENSE\n\nInvoice: " + invoice.getInvoiceId() + "\nItem: " +
