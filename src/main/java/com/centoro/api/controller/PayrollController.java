@@ -5,6 +5,7 @@ import com.centoro.api.service.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class PayrollController {
 
     @Autowired
     private PayrollService payrollService;
-
+    
     @GetMapping("/period/{period}")
     public ResponseEntity<?> getPayrollForPeriod(@PathVariable String period) {
         List<Map<String, Object>> payroll = payrollService.getPayrollForPeriod(period);
@@ -24,7 +25,7 @@ public class PayrollController {
             "data", payroll
         ));
     }
-
+    
     @GetMapping("/period/{period}/summary")
     public ResponseEntity<?> getPayrollSummary(@PathVariable String period) {
         Map<String, Object> summary = payrollService.getPayrollSummary(period);
@@ -33,26 +34,26 @@ public class PayrollController {
             "data", summary
         ));
     }
-
+    
+    // FIX: Changed @PathVariable to String
     @GetMapping("/staff/{staffId}")
-    public ResponseEntity<?> getStaffPayrollHistory(@PathVariable Long staffId) {
+    public ResponseEntity<?> getStaffPayrollHistory(@PathVariable String staffId) {
         List<PayrollRecord> records = payrollService.getStaffPayrollHistory(staffId);
         return ResponseEntity.ok(Map.of(
             "success", true,
             "data", records
         ));
     }
-
+    
+    // FIX: Changed @PathVariable to String
     @GetMapping("/staff/{staffId}/calculate")
-    public ResponseEntity<?> calculateStaffPayroll(@PathVariable Long staffId) {
-        // Get staff from repository
-        // This would need StaffRepository injected
+    public ResponseEntity<?> calculateStaffPayroll(@PathVariable String staffId) {
         return ResponseEntity.ok(Map.of(
             "success", true,
-            "message", "Use /api/staff/{id} to get staff data"
+            "message", "Use /api/staff/" + staffId + " to get staff data"
         ));
     }
-
+    
     @PostMapping("/period/{period}/process")
     public ResponseEntity<?> processPayroll(@PathVariable String period) {
         try {
@@ -69,7 +70,7 @@ public class PayrollController {
             ));
         }
     }
-
+    
     @PostMapping("/records/{recordId}/pay")
     public ResponseEntity<?> markRecordAsPaid(@PathVariable Long recordId) {
         try {
