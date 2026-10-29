@@ -17,9 +17,6 @@ public class ClientStatsController {
     @GetMapping
     public ResponseEntity<?> getClientStats() {
         Map<String, Object> stats = clientService.getClientStats();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 }
