@@ -78,7 +78,7 @@ public class ChatController {
         if (!clientRepository.existsById(request.getClientId())) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
         
         Chat chat = new Chat();
-        chat.setClientId(request.getClientId());
+        chat.setClientId(request.getClientId()); // String
         chat.setSubject(request.getSubject());
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
@@ -87,13 +87,12 @@ public class ChatController {
         Chat saved = chatService.createChat(chat);
         if (request.getText() != null && !request.getText().isEmpty()) {
             ChatMessage message = new ChatMessage();
-            message.setChatId(saved.getId());
+            message.setChatId(saved.getId()); // Long
             message.setFrom("client");
             message.setText(request.getText());
             chatService.addMessage(message);
         }
-        ChatDTO dto = convertToDTO(saved);
-        return ResponseEntity.ok(Map.of("success", true, "data", dto, "message", "Chat created successfully"));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(saved), "message", "Chat created successfully"));
     }
 
     @PostMapping("/{id}/messages")
@@ -103,6 +102,7 @@ public class ChatController {
         
         String from = (String) request.get("from");
         String text = (String) request.get("text");
+        // FIX: staffId is String now (Staff.id is UUID)
         String staffId = request.get("staffId") != null ? request.get("staffId").toString() : null;
         
         if (text == null || text.isEmpty()) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Message text is required"));
@@ -150,9 +150,9 @@ public class ChatController {
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setTitle(title);
-        jobCard.setClientId(chat.getClientId());
+        jobCard.setClientId(chat.getClientId()); // String
         jobCard.setProjectId(null);
-        jobCard.setAssigneeId(assigneeId);
+        jobCard.setAssigneeId(assigneeId); // String
         jobCard.setPriority(chat.getPriority());
         jobCard.setStatus("in_progress");
         jobCard.setDueDate(new Date(System.currentTimeMillis() + 7 * 86400000));
@@ -218,7 +218,7 @@ public class ChatController {
         ChatDTO dto = new ChatDTO();
         dto.setId(chat.getId());
         dto.setChatId(chat.getChatId());
-        dto.setClientId(chat.getClientId());
+        dto.setClientId(chat.getClientId()); // String
         clientRepository.findById(chat.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
         dto.setSubject(chat.getSubject());
         dto.setStatus(chat.getStatus());
@@ -234,9 +234,9 @@ public class ChatController {
         ChatMessageDTO dto = new ChatMessageDTO();
         dto.setId(message.getId());
         dto.setMessageId(message.getMessageId());
-        dto.setChatId(message.getChatId());
+        dto.setChatId(message.getChatId()); // Long
         dto.setFrom(message.getFrom());
-        dto.setStaffId(message.getStaffId());
+        dto.setStaffId(message.getStaffId()); // String
         dto.setText(message.getText());
         dto.setAttachment(message.getAttachment());
         dto.setCreatedAt(message.getCreatedAt());
