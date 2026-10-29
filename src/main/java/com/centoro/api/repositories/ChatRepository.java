@@ -14,6 +14,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("SELECT c FROM Chat c WHERE c.status = 'open'")
     List<Chat> findOpenChats();
     
-    // FIX: Changed from Long to String
+    List<Chat> findByStatus(String status);
+    
     List<Chat> findByClientId(String clientId);
 }
