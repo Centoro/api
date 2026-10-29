@@ -1,201 +1,137 @@
 package com.centoro.api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.centoro.api.entities.Client;
-import com.centoro.api.entities.Invoice;
-import com.centoro.api.repositories.InvoiceRepository;
+import com.centoro.api.dto.EmailAccountDTO;
+import com.centoro.api.dto.EmailCampaignDTO;
+import com.centoro.api.dto.SendEmailRequest;
+import com.centoro.api.entities.EmailAccount;
+import com.centoro.api.entities.EmailCampaign;
 import com.centoro.api.repositories.ClientRepository;
+import com.centoro.api.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/api/email")
 @CrossOrigin(origins = "*")
-public class InvoicesController {
+public class EmailController {
 
     @Autowired
-    private InvoiceRepository invoiceRepository;
+    private EmailService emailService;
     
     @Autowired
     private ClientRepository clientRepository;
-    
-    @GetMapping
-    public ResponseEntity<?> getAllInvoices() {
-        List<Invoice> invoices = invoiceRepository.findAll();
-        invoices.removeIf(i -> i.getDeletedAt() != null);
-        return ResponseEntity.ok(Map.of("success", true, "data", invoices));
+
+    @GetMapping("/accounts")
+    public ResponseEntity<?> getAllAccounts() {
+        List<EmailAccount> accounts = emailService.getAllAccounts();
+        List<EmailAccountDTO> accountDTOs = accounts.stream().map(this::convertAccountToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", accountDTOs));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getInvoice(@PathVariable String id) { // FIX: String
-        Optional<Invoice> invoice = invoiceRepository.findById(id);
-        if (invoice.isEmpty() || invoice.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(Map.of("success", true, "data", invoice.get()));
+    @GetMapping("/accounts/{id}")
+    public ResponseEntity<?> getAccount(@PathVariable Long id) {
+        Optional<EmailAccount> accountOpt = emailService.getAccountById(id);
+        if (accountOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(accountOpt.get())));
     }
 
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getInvoicesByClient(@PathVariable String clientId) { // FIX: String
-        List<Invoice> invoices = invoiceRepository.findByClientId(clientId);
-        return ResponseEntity.ok(Map.of("success", true, "data", invoices));
+    @PostMapping("/accounts")
+    public ResponseEntity<?> createAccount(@RequestBody EmailAccount account) {
+        EmailAccount saved = emailService.createAccount(account);
+        return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(saved), "message", "Email account connected successfully"));
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<?> getInvoicesByStatus(@PathVariable String status) {
-        Invoice.InvoiceStatus invoiceStatus;
-        try { invoiceStatus = Invoice.InvoiceStatus.valueOf(status); } 
-        catch (IllegalArgumentException e) { return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid status value")); }
-        List<Invoice> invoices = invoiceRepository.findByStatus(invoiceStatus);
-        return ResponseEntity.ok(Map.of("success", true, "data", invoices));
+    @PutMapping("/accounts/{id}")
+    public ResponseEntity<?> updateAccount(@PathVariable Long id, @RequestBody EmailAccount account) {
+        try {
+            EmailAccount updated = emailService.updateAccount(id, account);
+            return ResponseEntity.ok(Map.of("success", true, "data", convertAccountToDTO(updated), "message", "Email account updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/overdue")
-    public ResponseEntity<?> getOverdueInvoices() {
-        List<Invoice> invoices = invoiceRepository.findOverdueInvoices();
-        return ResponseEntity.ok(Map.of("success", true, "data", invoices));
+    @DeleteMapping("/accounts/{id}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        if (!emailService.getAccountById(id).isPresent()) return ResponseEntity.notFound().build();
+        emailService.deleteAccount(id);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Email account disconnected successfully"));
     }
 
-    @PostMapping
-    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice) {
-        if (!clientRepository.existsById(invoice.getClientId())) {
+    @GetMapping("/campaigns")
+    public ResponseEntity<?> getAllCampaigns() {
+        List<EmailCampaign> campaigns = emailService.getAllCampaigns();
+        List<EmailCampaignDTO> campaignDTOs = campaigns.stream().map(this::convertCampaignToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("success", true, "data", campaignDTOs));
+    }
+
+    @GetMapping("/campaigns/{id}")
+    public ResponseEntity<?> getCampaign(@PathVariable Long id) {
+        Optional<EmailCampaign> campaignOpt = emailService.getCampaignById(id);
+        if (campaignOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("success", true, "data", convertCampaignToDTO(campaignOpt.get())));
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<?> sendEmail(@RequestBody SendEmailRequest request) {
+        if (request.getAccountId() == null || request.getClientId() == null || request.getSubject() == null || request.getBody() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Missing required fields"));
+        }
+        try {
+            EmailCampaign saved = emailService.sendEmail(request);
+            return ResponseEntity.ok(Map.of("success", true, "data", convertCampaignToDTO(saved), "message", "Email sent successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Failed to send email: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/campaigns/{id}")
+    public ResponseEntity<?> deleteCampaign(@PathVariable Long id) {
+        if (!emailService.getCampaignById(id).isPresent()) return ResponseEntity.notFound().build();
+        emailService.deleteCampaign(id);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Email campaign deleted successfully"));
+    }
+
+    @GetMapping("/clients/{clientId}/services")
+    public ResponseEntity<?> getClientServices(@PathVariable String clientId) { // FIX: String
+        if (!clientRepository.existsById(clientId)) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Client not found"));
         }
-        invoice.setInvoiceId("INV-" + String.format("%04d", System.currentTimeMillis() % 10000));
-        invoice.setCreatedAt(new Date());
-        invoice.setUpdatedAt(new Date());
-        invoice.setPaid(0.0);
-        if (invoice.getStatus() == null) invoice.setStatus(Invoice.InvoiceStatus.unpaid);
-        if (invoice.getSubtotal() == null) invoice.setSubtotal(0.0);
-        if (invoice.getDiscountPct() == null) invoice.setDiscountPct(0.0);
-        if (invoice.getVat() == null) invoice.setVat(0.0);
-        if (invoice.getTotal() == null) invoice.setTotal(0.0);
-        
-        Invoice saved = invoiceRepository.save(invoice);
-        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Invoice created successfully"));
+        List<String> services = emailService.getClientServices(clientId);
+        return ResponseEntity.ok(Map.of("success", true, "data", services));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateInvoice(@PathVariable String id, @RequestBody Invoice invoice) { // FIX: String
-        Optional<Invoice> existingOpt = invoiceRepository.findById(id);
-        if (existingOpt.isEmpty() || existingOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        
-        Invoice existing = existingOpt.get();
-        existing.setClientId(invoice.getClientId());
-        existing.setProjectId(invoice.getProjectId());
-        existing.setService(invoice.getService());
-        existing.setItems(invoice.getItems());
-        existing.setSubtotal(invoice.getSubtotal());
-        existing.setDiscountPct(invoice.getDiscountPct());
-        existing.setVat(invoice.getVat());
-        existing.setTotal(invoice.getTotal());
-        existing.setStatus(invoice.getStatus());
-        existing.setIssueDate(invoice.getIssueDate());
-        existing.setDueDate(invoice.getDueDate());
-        existing.setUpdatedAt(new Date());
-        
-        Invoice updated = invoiceRepository.save(existing);
-        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Invoice updated successfully"));
+    private EmailAccountDTO convertAccountToDTO(EmailAccount account) {
+        EmailAccountDTO dto = new EmailAccountDTO();
+        dto.setId(account.getId());
+        dto.setAccountId(account.getAccountId());
+        dto.setType(account.getType());
+        dto.setLabel(account.getLabel());
+        dto.setEmail(account.getEmail());
+        dto.setStatus(account.getStatus());
+        dto.setConnectedAt(account.getConnectedAt());
+        dto.setCreatedAt(account.getCreatedAt());
+        return dto;
     }
 
-    @PostMapping("/{id}/payment")
-    public ResponseEntity<?> recordPayment(@PathVariable String id, @RequestBody Map<String, Object> paymentData) { // FIX: String
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
-        if (invoiceOpt.isEmpty() || invoiceOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        
-        Invoice invoice = invoiceOpt.get();
-        Double amount = Double.valueOf(paymentData.get("amount").toString());
-        invoice.setPaid(invoice.getPaid() + amount);
-        
-        if (invoice.getPaid() >= invoice.getTotal()) invoice.setStatus(Invoice.InvoiceStatus.paid);
-        else if (invoice.getPaid() > 0) invoice.setStatus(Invoice.InvoiceStatus.partial);
-        
-        invoice.setUpdatedAt(new Date());
-        Invoice updated = invoiceRepository.save(invoice);
-        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Payment recorded successfully"));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteInvoice(@PathVariable String id) { // FIX: String
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
-        if (invoiceOpt.isEmpty()) return ResponseEntity.notFound().build();
-        Invoice invoice = invoiceOpt.get();
-        invoice.setDeletedAt(new Date());
-        invoiceRepository.save(invoice);
-        return ResponseEntity.ok(Map.of("success", true, "message", "Invoice deleted successfully"));
-    }
-    
-    @GetMapping("/stats")
-    public ResponseEntity<?> getInvoiceStats() {
-        List<Invoice> invoices = invoiceRepository.findAll();
-        invoices.removeIf(i -> i.getDeletedAt() != null);
-        double totalBilled = invoices.stream().mapToDouble(i -> i.getTotal() != null ? i.getTotal() : 0.0).sum();
-        double totalPaid = invoices.stream().mapToDouble(i -> i.getPaid() != null ? i.getPaid() : 0.0).sum();
-        Map<String, Object> stats = Map.of("totalBilled", totalBilled, "totalPaid", totalPaid, "totalOutstanding", totalBilled - totalPaid, "totalInvoices", (long) invoices.size());
-        return ResponseEntity.ok(Map.of("success", true, "data", stats));
-    }
-
-    @GetMapping("/client/{clientId}/stats")
-    public ResponseEntity<?> getClientInvoiceStats(@PathVariable String clientId) { // FIX: String
-        List<Invoice> invoices = invoiceRepository.findByClientId(clientId);
-        invoices.removeIf(i -> i.getDeletedAt() != null);
-        double totalBilled = invoices.stream().mapToDouble(i -> i.getTotal() != null ? i.getTotal() : 0.0).sum();
-        double totalPaid = invoices.stream().mapToDouble(i -> i.getPaid() != null ? i.getPaid() : 0.0).sum();
-        long paidCount = invoices.stream().filter(i -> i.getStatus() == Invoice.InvoiceStatus.paid).count();
-        Map<String, Object> stats = Map.of("totalBilled", totalBilled, "totalPaid", totalPaid, "totalOutstanding", totalBilled - totalPaid, "totalInvoices", (long) invoices.size(), "paidCount", paidCount, "unpaidCount", invoices.size() - paidCount);
-        return ResponseEntity.ok(Map.of("success", true, "data", stats));
-    }
-
-    @GetMapping("/services")
-    public ResponseEntity<?> getInvoiceServices() {
-        List<Invoice> invoices = invoiceRepository.findAll();
-        invoices.removeIf(i -> i.getDeletedAt() != null);
-        Set<String> services = new HashSet<>();
-        for (Invoice invoice : invoices) {
-            if (invoice.getService() != null && !invoice.getService().isEmpty()) services.add(invoice.getService());
-        }
-        return ResponseEntity.ok(Map.of("success", true, "data", new ArrayList<>(services)));
-    }
-
-    @GetMapping("/tracking/{trackingNumber}")
-    public ResponseEntity<?> getInvoiceByTrackingNumber(@PathVariable String trackingNumber) {
-        Optional<Invoice> invoice = invoiceRepository.findByTrackingNumber(trackingNumber);
-        if (invoice.isEmpty() || invoice.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(Map.of("success", true, "data", invoice.get()));
-    }
-
-    @PostMapping("/{id}/mark-paid")
-    public ResponseEntity<?> markInvoiceAsPaid(@PathVariable String id) { // FIX: String
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
-        if (invoiceOpt.isEmpty() || invoiceOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        Invoice invoice = invoiceOpt.get();
-        invoice.setPaid(invoice.getTotal());
-        invoice.setStatus(Invoice.InvoiceStatus.paid);
-        invoice.setUpdatedAt(new Date());
-        Invoice saved = invoiceRepository.save(invoice);
-        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Invoice marked as paid"));
-    }
-
-    @PostMapping("/{id}/generate-tracking")
-    public ResponseEntity<?> generateTrackingNumber(@PathVariable String id) { // FIX: String
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
-        if (invoiceOpt.isEmpty() || invoiceOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
-        Invoice invoice = invoiceOpt.get();
-        String trackingNumber = generateTrackingNumber(invoice.getClientId(), new Date());
-        invoice.setTrackingNumber(trackingNumber);
-        invoice.setUpdatedAt(new Date());
-        invoiceRepository.save(invoice);
-        return ResponseEntity.ok(Map.of("success", true, "data", Map.of("trackingNumber", trackingNumber), "message", "Tracking number generated"));
-    }
-
-    private String generateTrackingNumber(String clientId, Date issueDate) {
-        Optional<Client> clientOpt = clientRepository.findById(clientId);
-        String code = clientOpt.map(c -> c.getCode() != null ? c.getCode() : "CL").orElse("CL");
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String dateStr = sdf.format(issueDate);
-        int count = invoiceRepository.findAll().size() + 1;
-        return code + String.format("%02d", count) + "-" + dateStr;
+    private EmailCampaignDTO convertCampaignToDTO(EmailCampaign campaign) {
+        EmailCampaignDTO dto = new EmailCampaignDTO();
+        dto.setId(campaign.getId());
+        dto.setCampaignId(campaign.getCampaignId());
+        dto.setSubject(campaign.getSubject());
+        dto.setBody(campaign.getBody());
+        dto.setRecipient(campaign.getRecipient());
+        dto.setRecipientsCount(campaign.getRecipientsCount());
+        dto.setProvider(campaign.getProvider());
+        dto.setAttachments(campaign.getAttachments());
+        dto.setStatus(campaign.getStatus());
+        dto.setSentAt(campaign.getSentAt());
+        dto.setCreatedAt(campaign.getCreatedAt());
+        return dto;
     }
 }
