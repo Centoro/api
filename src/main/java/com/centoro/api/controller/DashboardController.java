@@ -1,22 +1,62 @@
-package com.centoro.api.repositories;
+package com.centoro.api.controller;
 
-import com.centoro.api.entities.Chat;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
+import com.centoro.api.entities.Invoice;
+import com.centoro.api.entities.Project;
+import com.centoro.api.entities.Payment;
+import com.centoro.api.repositories.InvoiceRepository;
+import com.centoro.api.repositories.ProjectRepository;
+import com.centoro.api.repositories.PaymentRepository;
+import com.centoro.api.repositories.ChatRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
 
-@Repository
-public interface ChatRepository extends JpaRepository<Chat, Long> {
-    Optional<Chat> findByChatId(String chatId);
+@RestController
+@RequestMapping("/api/dashboard")
+@CrossOrigin(origins = "*")
+public class DashboardController {
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
     
-    @Query("SELECT c FROM Chat c WHERE c.status = 'open'")
-    List<Chat> findOpenChats();
+    @Autowired
+    private ProjectRepository projectRepository;
     
-    // FIX: Add this for DashboardController
-    List<Chat> findByStatus(String status);
+    @Autowired
+    private PaymentRepository paymentRepository;
     
-    // FIX: Changed from Long to String
-    List<Chat> findByClientId(String clientId);
+    @Autowired
+    private ChatRepository chatRepository;
+
+    @GetMapping("/stats")
+    public ResponseEntity<?> getStats() {
+        Double totalRevenue = paymentRepository.findAll().stream()
+            .mapToDouble(Payment::getAmount)
+            .sum();
+        
+        Double totalOutstanding = invoiceRepository.findAll().stream()
+            .filter(i -> i.getStatus() != Invoice.InvoiceStatus.paid)
+            .mapToDouble(i -> i.getTotal() - i.getPaid())
+            .sum();
+        
+        long activeProjects = projectRepository.findAll().stream()
+            .filter(p -> p.getStatus() != Project.ProjectStatus.completed)
+            .filter(p -> p.getDeletedAt() == null)
+            .count();
+        
+        long openChats = chatRepository.findByStatus("open").size();
+        
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalRevenue", totalRevenue);
+        stats.put("totalOutstanding", totalOutstanding);
+        stats.put("activeProjects", activeProjects);
+        stats.put("openChats", openChats);
+        
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "data", stats
+        ));
+    }
 }
