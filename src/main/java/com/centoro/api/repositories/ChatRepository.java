@@ -10,11 +10,9 @@ import java.util.Optional;
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
     Optional<Chat> findByChatId(String chatId);
-    
+    List<Chat> findByClientId(String clientId);
+    List<Chat> findByStatus(String status);
+
     @Query("SELECT c FROM Chat c WHERE c.status = 'open'")
     List<Chat> findOpenChats();
-    
-    List<Chat> findByStatus(String status);
-    
-    List<Chat> findByClientId(String clientId);
 }
