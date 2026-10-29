@@ -7,9 +7,11 @@ import java.util.Date;
 @Table(name = "clients")
 public class Client {
     
+    // FIX: Changed from Long to String to match the char(36) UUID in MySQL
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36)
+    private String id;
     
     @Column(name = "client_id", unique = true, nullable = false, length = 50)
     private String clientId;
@@ -82,9 +84,9 @@ public class Client {
         active, inactive
     }
     
-    // Getters and Setters - keep all your existing ones
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getClientId() { return clientId; }
     public void setClientId(String clientId) { this.clientId = clientId; }
     public String getCode() { return code; }
@@ -128,4 +130,3 @@ public class Client {
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
 }
-
