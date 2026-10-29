@@ -16,19 +16,11 @@ public class ChatMessage {
     @Column(name = "chat_id", nullable = false)
     private Long chatId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_id", insertable = false, updatable = false)
-    private Chat chat;
-
     @Column(nullable = false, length = 20)
     private String from;
 
     @Column(name = "staff_id", length = 36)
     private String staffId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id", insertable = false, updatable = false)
-    private Staff staff;
 
     @Column(columnDefinition = "TEXT")
     private String text;
@@ -46,14 +38,10 @@ public class ChatMessage {
     public void setMessageId(String messageId) { this.messageId = messageId; }
     public Long getChatId() { return chatId; }
     public void setChatId(Long chatId) { this.chatId = chatId; }
-    public Chat getChat() { return chat; }
-    public void setChat(Chat chat) { this.chat = chat; }
     public String getFrom() { return from; }
     public void setFrom(String from) { this.from = from; }
     public String getStaffId() { return staffId; }
     public void setStaffId(String staffId) { this.staffId = staffId; }
-    public Staff getStaff() { return staff; }
-    public void setStaff(Staff staff) { this.staff = staff; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
     public String getAttachment() { return attachment; }
