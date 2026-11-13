@@ -32,13 +32,13 @@ public class JobCardsController {
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getJobCardsByClient(@PathVariable String clientId) { // FIX
+    public ResponseEntity<?> getJobCardsByClient(@PathVariable String clientId) {
         List<JobCard> jobCards = jobCardRepository.findByClientId(clientId);
         return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<?> getJobCardsByProject(@PathVariable String projectId) { // FIX
+    public ResponseEntity<?> getJobCardsByProject(@PathVariable String projectId) {
         List<JobCard> jobCards = jobCardRepository.findByProjectId(projectId);
         return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
@@ -184,7 +184,7 @@ public class JobCardsController {
     }
 
     @GetMapping("/project/{projectId}/stats")
-    public ResponseEntity<?> getProjectJobStats(@PathVariable String projectId) { // FIX
+    public ResponseEntity<?> getProjectJobStats(@PathVariable String projectId) {
         List<JobCard> jobCards = jobCardRepository.findByProjectId(projectId);
         jobCards.removeIf(j -> j.getDeletedAt() != null);
         long total = jobCards.size();
