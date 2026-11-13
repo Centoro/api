@@ -19,10 +19,7 @@ public class JobCardsController {
     public ResponseEntity<?> getAllJobCards() {
         List<JobCard> jobCards = jobCardRepository.findAll();
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCards
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @GetMapping("/{id}")
@@ -31,51 +28,35 @@ public class JobCardsController {
         if (jobCard.isEmpty() || jobCard.get().getDeletedAt() != null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCard.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCard.get()));
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getJobCardsByClient(@PathVariable Long clientId) {
+    public ResponseEntity<?> getJobCardsByClient(@PathVariable String clientId) { // FIX
         List<JobCard> jobCards = jobCardRepository.findByClientId(clientId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCards
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<?> getJobCardsByProject(@PathVariable Long projectId) {
+    public ResponseEntity<?> getJobCardsByProject(@PathVariable String projectId) { // FIX
         List<JobCard> jobCards = jobCardRepository.findByProjectId(projectId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCards
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @GetMapping("/assignee/{assigneeId}")
     public ResponseEntity<?> getJobCardsByAssignee(@PathVariable Long assigneeId) {
         List<JobCard> jobCards = jobCardRepository.findByAssigneeId(assigneeId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCards
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getJobCardsByStatus(@PathVariable String status) {
         List<JobCard> jobCards = jobCardRepository.findByStatus(status);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", jobCards
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
 
     @PostMapping
     public ResponseEntity<?> createJobCard(@RequestBody JobCard jobCard) {
-        // Generate job card ID
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setLoggedAt(new Date());
         jobCard.setUpdatedAt(new Date());
@@ -88,11 +69,7 @@ public class JobCardsController {
         if (jobCard.getSource() == null) jobCard.setSource("walk-in");
         
         JobCard saved = jobCardRepository.save(jobCard);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Job card created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Job card created successfully"));
     }
 
     @PutMapping("/{id}")
@@ -120,11 +97,7 @@ public class JobCardsController {
         existing.setUpdatedAt(new Date());
         
         JobCard updated = jobCardRepository.save(existing);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", updated,
-            "message", "Job card updated successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Job card updated successfully"));
     }
 
     @DeleteMapping("/{id}")
@@ -138,13 +111,8 @@ public class JobCardsController {
         jobCard.setDeletedAt(new Date());
         jobCardRepository.save(jobCard);
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Job card deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Job card deleted successfully"));
     }
-
-    // ============ ADDITIONAL ENDPOINTS ============
 
     @GetMapping("/stats")
     public ResponseEntity<?> getJobCardStats() {
@@ -152,212 +120,116 @@ public class JobCardsController {
         jobCards.removeIf(j -> j.getDeletedAt() != null);
         
         long total = jobCards.size();
-        long inProgress = jobCards.stream()
-            .filter(j -> "in_progress".equals(j.getStatus()))
-            .count();
-        long completed = jobCards.stream()
-            .filter(j -> "completed".equals(j.getStatus()))
-            .count();
-        long pending = jobCards.stream()
-            .filter(j -> "pending".equals(j.getStatus()))
-            .count();
+        long inProgress = jobCards.stream().filter(j -> "in_progress".equals(j.getStatus())).count();
+        long completed = jobCards.stream().filter(j -> "completed".equals(j.getStatus())).count();
+        long pending = jobCards.stream().filter(j -> "pending".equals(j.getStatus())).count();
         
-        double totalHours = jobCards.stream()
-            .mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0)
-            .sum();
+        double totalHours = jobCards.stream().mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0).sum();
         
         Map<String, Object> stats = Map.of(
-            "total", total,
-            "inProgress", inProgress,
-            "completed", completed,
-            "pending", pending,
-            "totalHours", totalHours
+            "total", total, "inProgress", inProgress, "completed", completed,
+            "pending", pending, "totalHours", totalHours
         );
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @GetMapping("/services")
     public ResponseEntity<?> getJobCardServices() {
         List<JobCard> jobCards = jobCardRepository.findAll();
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         Set<String> services = new HashSet<>();
         for (JobCard job : jobCards) {
-            if (job.getService() != null && !job.getService().isEmpty()) {
-                services.add(job.getService());
-            }
+            if (job.getService() != null && !job.getService().isEmpty()) services.add(job.getService());
         }
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", new ArrayList<>(services)
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", new ArrayList<>(services)));
     }
 
     @GetMapping("/types")
     public ResponseEntity<?> getJobCardTypes() {
         List<JobCard> jobCards = jobCardRepository.findAll();
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         Set<String> types = new HashSet<>();
         for (JobCard job : jobCards) {
-            if (job.getType() != null && !job.getType().isEmpty()) {
-                types.add(job.getType());
-            }
+            if (job.getType() != null && !job.getType().isEmpty()) types.add(job.getType());
         }
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", new ArrayList<>(types)
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", new ArrayList<>(types)));
     }
 
     @GetMapping("/assignee/{assigneeId}/stats")
     public ResponseEntity<?> getAssigneeStats(@PathVariable Long assigneeId) {
         List<JobCard> jobCards = jobCardRepository.findByAssigneeId(assigneeId);
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         long total = jobCards.size();
-        long completed = jobCards.stream()
-            .filter(j -> "completed".equals(j.getStatus()))
-            .count();
-        long inProgress = jobCards.stream()
-            .filter(j -> "in_progress".equals(j.getStatus()))
-            .count();
-        
-        double totalHours = jobCards.stream()
-            .mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0)
-            .sum();
-        
+        long completed = jobCards.stream().filter(j -> "completed".equals(j.getStatus())).count();
+        long inProgress = jobCards.stream().filter(j -> "in_progress".equals(j.getStatus())).count();
+        double totalHours = jobCards.stream().mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0).sum();
         Map<String, Object> stats = Map.of(
-            "total", total,
-            "completed", completed,
-            "inProgress", inProgress,
-            "totalHours", totalHours,
-            "completionRate", total > 0 ? (double) completed / total * 100 : 0.0
+            "total", total, "completed", completed, "inProgress", inProgress,
+            "totalHours", totalHours, "completionRate", total > 0 ? (double) completed / total * 100 : 0.0
         );
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @GetMapping("/overdue")
     public ResponseEntity<?> getOverdueJobCards() {
         List<JobCard> jobCards = jobCardRepository.findAll();
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         Date today = new Date();
         List<JobCard> overdue = jobCards.stream()
             .filter(j -> !"completed".equals(j.getStatus()))
             .filter(j -> j.getDueDate() != null && j.getDueDate().before(today))
             .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", overdue
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", overdue));
     }
 
     @GetMapping("/project/{projectId}/stats")
-    public ResponseEntity<?> getProjectJobStats(@PathVariable Long projectId) {
+    public ResponseEntity<?> getProjectJobStats(@PathVariable String projectId) { // FIX
         List<JobCard> jobCards = jobCardRepository.findByProjectId(projectId);
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         long total = jobCards.size();
-        long completed = jobCards.stream()
-            .filter(j -> "completed".equals(j.getStatus()))
-            .count();
-        long inProgress = jobCards.stream()
-            .filter(j -> "in_progress".equals(j.getStatus()))
-            .count();
-        
-        double totalHours = jobCards.stream()
-            .mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0)
-            .sum();
-        
+        long completed = jobCards.stream().filter(j -> "completed".equals(j.getStatus())).count();
+        long inProgress = jobCards.stream().filter(j -> "in_progress".equals(j.getStatus())).count();
+        double totalHours = jobCards.stream().mapToDouble(j -> j.getHours() != null ? j.getHours() : 0.0).sum();
         Map<String, Object> stats = Map.of(
-            "total", total,
-            "completed", completed,
-            "inProgress", inProgress,
-            "totalHours", totalHours,
-            "completionRate", total > 0 ? (double) completed / total * 100 : 0.0
+            "total", total, "completed", completed, "inProgress", inProgress,
+            "totalHours", totalHours, "completionRate", total > 0 ? (double) completed / total * 100 : 0.0
         );
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @PostMapping("/{id}/status")
     public ResponseEntity<?> updateJobStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String status = request.get("status");
-        if (status == null || status.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Status is required"
-            ));
-        }
-        
+        if (status == null || status.isEmpty()) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Status is required"));
         Optional<JobCard> jobOpt = jobCardRepository.findById(id);
-        if (jobOpt.isEmpty() || jobOpt.get().getDeletedAt() != null) {
-            return ResponseEntity.notFound().build();
-        }
-        
+        if (jobOpt.isEmpty() || jobOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
         JobCard job = jobOpt.get();
         job.setStatus(status);
         job.setUpdatedAt(new Date());
         job.setUpdatedBy(request.get("updatedBy") != null ? request.get("updatedBy") : "System");
-        
         JobCard updated = jobCardRepository.save(job);
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", updated,
-            "message", "Job status updated successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Job status updated successfully"));
     }
 
     @PostMapping("/{id}/assign")
     public ResponseEntity<?> assignJob(@PathVariable Long id, @RequestBody Map<String, Long> request) {
         Long assigneeId = request.get("assigneeId");
-        if (assigneeId == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Assignee ID is required"
-            ));
-        }
-        
+        if (assigneeId == null) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Assignee ID is required"));
         Optional<JobCard> jobOpt = jobCardRepository.findById(id);
-        if (jobOpt.isEmpty() || jobOpt.get().getDeletedAt() != null) {
-            return ResponseEntity.notFound().build();
-        }
-        
+        if (jobOpt.isEmpty() || jobOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
         JobCard job = jobOpt.get();
         job.setAssigneeId(assigneeId);
         job.setUpdatedAt(new Date());
         job.setStatus("in_progress");
-        
         JobCard updated = jobCardRepository.save(job);
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", updated,
-            "message", "Job assigned successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Job assigned successfully"));
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchJobCards(@RequestParam String q) {
         List<JobCard> jobCards = jobCardRepository.findAll();
         jobCards.removeIf(j -> j.getDeletedAt() != null);
-        
         String query = q.toLowerCase();
         List<JobCard> results = jobCards.stream()
             .filter(j -> 
@@ -368,10 +240,6 @@ public class JobCardsController {
                 (j.getStatus() != null && j.getStatus().toLowerCase().contains(query))
             )
             .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", results
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", results));
     }
 }
