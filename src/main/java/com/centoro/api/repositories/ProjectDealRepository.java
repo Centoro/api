@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface ProjectDealRepository extends JpaRepository<ProjectDeal, Long> {
     List<ProjectDeal> findByStage(String stage);
-    List<ProjectDeal> findByClientId(String clientId);
+    List<ProjectDeal> findByClientId(Long clientId);
 }
