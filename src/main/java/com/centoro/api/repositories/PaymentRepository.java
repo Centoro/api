@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    // FIX: invoiceId is String now
-    List<Payment> findByInvoiceId(String invoiceId);
+    List<Payment> findByInvoiceId(String invoiceId); // FIX: String
 }
