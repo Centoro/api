@@ -23,7 +23,7 @@ public class CompetitionController {
     
     @GetMapping("/user/{userId}") 
     public List<CompetitionEntry> getEntriesByUser(@PathVariable Long userId) { 
-        return competitionRepository.findByUserId(userId); 
+        return competitionRepository.findByUserid(String.valueOf(userId)); 
     }
     
     @PostMapping 
