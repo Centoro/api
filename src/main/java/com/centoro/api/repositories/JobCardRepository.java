@@ -8,8 +8,8 @@ import java.util.Optional;
 public interface JobCardRepository extends JpaRepository<JobCard, Long> {
     
     Optional<JobCard> findByJobCardId(String jobCardId);
-    List<JobCard> findByClientId(Long clientId);
-    List<JobCard> findByProjectId(Long projectId);
+    List<JobCard> findByClientId(String clientId);
+    List<JobCard> findByProjectId(String projectId);
     List<JobCard> findByAssigneeId(Long assigneeId);
     List<JobCard> findByStatus(String status);
     List<JobCard> findByPriority(String priority);
