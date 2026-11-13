@@ -144,12 +144,17 @@ public class ChatController {
         Chat chat = chatOpt.get();
         String title = (String) request.get("title");
         if (title == null || title.isEmpty()) title = chat.getSubject();
-        String assigneeId = request.get("assigneeId") != null ? String.valueOf(request.get("assigneeId")) : null;
+        
+        // FIX: assigneeId is a Long in JobCard, so convert safely
+        Long assigneeId = null;
+        if (request.get("assigneeId") != null) {
+            try { assigneeId = Long.valueOf(request.get("assigneeId").toString()); } catch (Exception ignored) {}
+        }
 
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setTitle(title);
-        jobCard.setClientId(chat.getClientId());
+        jobCard.setClientId(chat.getClientId()); // FIX: String
         jobCard.setProjectId(null);
         jobCard.setAssigneeId(assigneeId);
         jobCard.setPriority(chat.getPriority());
@@ -218,7 +223,12 @@ public class ChatController {
         dto.setId(chat.getId());
         dto.setChatId(chat.getChatId());
         dto.setClientId(chat.getClientId());
-        clientRepository.findById(chat.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
+        
+        // FIX: Safely fetch client name (Client.id is String)
+        if (chat.getClientId() != null) {
+            clientRepository.findById(chat.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
+        }
+        
         dto.setSubject(chat.getSubject());
         dto.setStatus(chat.getStatus());
         dto.setPriority(chat.getPriority());
@@ -239,8 +249,12 @@ public class ChatController {
         dto.setText(message.getText());
         dto.setAttachment(message.getAttachment());
         dto.setCreatedAt(message.getCreatedAt());
+        
         if (message.getStaffId() != null && !message.getStaffId().isBlank()) {
-            staffRepository.findById(message.getStaffId()).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+            try {
+                Long staffIdLong = Long.valueOf(message.getStaffId());
+                staffRepository.findById(staffIdLong).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+            } catch (NumberFormatException ignored) {}
         }
         return dto;
     }
