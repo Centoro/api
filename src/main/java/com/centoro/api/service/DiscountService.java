@@ -29,8 +29,7 @@ public class DiscountService {
         return discountRepository.findAll();
     }
     
-    // FIX: Changed from Long to String
-    public List<Discount> getDiscountsByClient(String clientId) {
+    public List<Discount> getDiscountsByClient(String clientId) { // FIX: String
         return discountRepository.findByClientId(clientId);
     }
     
