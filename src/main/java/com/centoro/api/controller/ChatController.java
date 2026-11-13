@@ -145,7 +145,6 @@ public class ChatController {
         String title = (String) request.get("title");
         if (title == null || title.isEmpty()) title = chat.getSubject();
         
-        // FIX: assigneeId is a Long in JobCard, so convert safely
         Long assigneeId = null;
         if (request.get("assigneeId") != null) {
             try { assigneeId = Long.valueOf(request.get("assigneeId").toString()); } catch (Exception ignored) {}
@@ -154,7 +153,7 @@ public class ChatController {
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setTitle(title);
-        jobCard.setClientId(chat.getClientId()); // FIX: String
+        jobCard.setClientId(chat.getClientId()); // String
         jobCard.setProjectId(null);
         jobCard.setAssigneeId(assigneeId);
         jobCard.setPriority(chat.getPriority());
@@ -224,7 +223,6 @@ public class ChatController {
         dto.setChatId(chat.getChatId());
         dto.setClientId(chat.getClientId());
         
-        // FIX: Safely fetch client name (Client.id is String)
         if (chat.getClientId() != null) {
             clientRepository.findById(chat.getClientId()).ifPresent(c -> dto.setClientName(c.getName()));
         }
