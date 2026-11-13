@@ -17,15 +17,15 @@ public class JobCard {
     @Column(nullable = false)
     private String title;
     
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "client_id", length = 36)
+    private String clientId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", insertable = false, updatable = false)
     private Client client;
     
-    @Column(name = "project_id")
-    private Long projectId;
+    @Column(name = "project_id", length = 36)
+    private String projectId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", insertable = false, updatable = false)
@@ -97,14 +97,14 @@ public class JobCard {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public String getProjectId() { return projectId; }
+    public void setProjectId(String projectId) { this.projectId = projectId; }
     
     public Project getProject() { return project; }
     public void setProject(Project project) { this.project = project; }
