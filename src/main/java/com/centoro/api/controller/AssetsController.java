@@ -31,16 +31,11 @@ public class AssetsController {
     @Autowired
     private AssetService assetService;
 
-    // ============ ASSET CRUD ============
-    
     @GetMapping
     public ResponseEntity<?> getAllAssets() {
         List<Asset> assets = assetRepository.findAll();
         assets.removeIf(a -> a.getDeletedAt() != null);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", assets
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", assets));
     }
 
     @GetMapping("/{id}")
@@ -49,10 +44,7 @@ public class AssetsController {
         if (asset.isEmpty() || asset.get().getDeletedAt() != null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", asset.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", asset.get()));
     }
 
     @PostMapping
@@ -67,11 +59,7 @@ public class AssetsController {
         if (asset.getLifeYears() == null) asset.setLifeYears(3);
         
         Asset saved = assetRepository.save(asset);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Asset created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Asset created successfully"));
     }
 
     @PutMapping("/{id}")
@@ -92,11 +80,7 @@ public class AssetsController {
         existing.setUpdatedAt(new Date());
         
         Asset updated = assetRepository.save(existing);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", updated,
-            "message", "Asset updated successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Asset updated successfully"));
     }
 
     @DeleteMapping("/{id}")
@@ -110,67 +94,41 @@ public class AssetsController {
         asset.setDeletedAt(new Date());
         assetRepository.save(asset);
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Asset deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Asset deleted successfully"));
     }
 
-    // ============ BOOKINGS ============
-    
     @GetMapping("/bookings")
     public ResponseEntity<?> getAllBookings() {
         List<AssetBooking> bookings = assetBookingRepository.findAll();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", bookings
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", bookings));
     }
 
     @GetMapping("/bookings/active")
     public ResponseEntity<?> getActiveBookings() {
         List<AssetBooking> bookings = assetBookingRepository.findByReturnedDateIsNull();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", bookings
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", bookings));
     }
 
     @GetMapping("/{assetId}/bookings")
     public ResponseEntity<?> getAssetBookings(@PathVariable Long assetId) {
         List<AssetBooking> bookings = assetBookingRepository.findByAssetId(assetId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", bookings
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", bookings));
     }
 
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@RequestBody AssetBooking booking) {
-        // Validate asset exists
         if (!assetRepository.existsById(booking.getAssetId())) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Asset not found"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Asset not found"));
         }
         
-        // Validate staff exists
-        if (!staffRepository.existsById(booking.getStaffId())) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Staff not found"
-            ));
+        if (!staffRepository.existsByStaffId(booking.getStaffId())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Staff not found"));
         }
         
-        // Check if asset is already booked
         List<AssetBooking> existingBookings = assetBookingRepository.findByAssetId(booking.getAssetId());
         boolean isBooked = existingBookings.stream().anyMatch(b -> b.getReturnedDate() == null);
         if (isBooked) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Asset is already booked out"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Asset is already booked out"));
         }
         
         booking.setBookingId("BKG-" + String.format("%04d", System.currentTimeMillis() % 10000));
@@ -179,17 +137,12 @@ public class AssetsController {
         
         if (booking.getOutDate() == null) booking.setOutDate(new Date());
         
-        // Update asset status
         Asset asset = assetRepository.findById(booking.getAssetId()).get();
         asset.setStatus("booked");
         assetRepository.save(asset);
         
         AssetBooking saved = assetBookingRepository.save(booking);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Asset booked successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Asset booked successfully"));
     }
 
     @PutMapping("/bookings/{bookingId}/return")
@@ -204,16 +157,11 @@ public class AssetsController {
         booking.setUpdatedAt(new Date());
         assetBookingRepository.save(booking);
         
-        // Update asset status
         Asset asset = assetRepository.findById(booking.getAssetId()).get();
         asset.setStatus("active");
         assetRepository.save(asset);
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", booking,
-            "message", "Asset returned successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", booking, "message", "Asset returned successfully"));
     }
 
     @DeleteMapping("/bookings/{id}")
@@ -223,30 +171,19 @@ public class AssetsController {
         }
         
         assetBookingRepository.deleteById(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Booking deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Booking deleted successfully"));
     }
 
-    // ============ STATS ============
-    
     @GetMapping("/stats")
     public ResponseEntity<?> getAssetStats() {
         Map<String, Object> stats = assetService.getAssetStats();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", stats
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", stats));
     }
 
     @GetMapping("/available")
     public ResponseEntity<?> getAvailableAssets() {
         List<Asset> assets = assetService.getAvailableAssets();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", assets
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", assets));
     }
 
     @GetMapping("/{id}/depreciation")
@@ -257,9 +194,6 @@ public class AssetsController {
         }
         
         Map<String, Object> depreciation = assetService.calculateDepreciation(assetOpt.get());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", depreciation
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", depreciation));
     }
 }
