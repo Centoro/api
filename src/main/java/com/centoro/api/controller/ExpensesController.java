@@ -22,10 +22,7 @@ public class ExpensesController {
     public ResponseEntity<?> getAllExpenses() {
         List<Expense> expenses = expenseRepository.findAll();
         expenses.removeIf(e -> e.getDeletedAt() != null);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", expenses
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", expenses));
     }
 
     @GetMapping("/{id}")
@@ -34,19 +31,13 @@ public class ExpensesController {
         if (expense.isEmpty() || expense.get().getDeletedAt() != null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", expense.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", expense.get()));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<?> getExpensesByProject(@PathVariable Long projectId) {
+    public ResponseEntity<?> getExpensesByProject(@PathVariable String projectId) {
         List<Expense> expenses = expenseRepository.findByProjectId(projectId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", expenses
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", expenses));
     }
 
     @GetMapping("/status/{status}")
@@ -55,21 +46,14 @@ public class ExpensesController {
         try {
             expenseStatus = Expense.ExpenseStatus.valueOf(status);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Invalid status value"
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid status value"));
         }
         List<Expense> expenses = expenseRepository.findByStatus(expenseStatus);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", expenses
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", expenses));
     }
 
     @PostMapping
     public ResponseEntity<?> createExpense(@RequestBody Expense expense) {
-        // Generate expense ID
         expense.setExpenseId("EXP-" + String.format("%04d", System.currentTimeMillis() % 10000));
         expense.setCreatedAt(new Date());
         expense.setUpdatedAt(new Date());
@@ -78,11 +62,7 @@ public class ExpensesController {
         if (expense.getVatClaimable() == null) expense.setVatClaimable(0.0);
         
         Expense saved = expenseRepository.save(expense);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Expense created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Expense created successfully"));
     }
 
     @PutMapping("/{id}")
@@ -104,11 +84,7 @@ public class ExpensesController {
         existing.setUpdatedAt(new Date());
         
         Expense updated = expenseRepository.save(existing);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", updated,
-            "message", "Expense updated successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Expense updated successfully"));
     }
 
     @DeleteMapping("/{id}")
@@ -122,9 +98,6 @@ public class ExpensesController {
         expense.setDeletedAt(new Date());
         expenseRepository.save(expense);
         
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Expense deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Expense deleted successfully"));
     }
 }
