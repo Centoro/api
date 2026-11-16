@@ -20,22 +20,11 @@ import java.util.Optional;
 @Service
 public class PhoneService {
     
-    @Autowired
-    private PhoneLineRepository phoneLineRepository;
-    
-    @Autowired
-    private SmsProviderRepository smsProviderRepository;
-    
-    @Autowired
-    private PhoneBookContactRepository phoneBookContactRepository;
-    
-    @Autowired
-    private SmsCampaignRepository smsCampaignRepository;
-    
-    @Autowired
-    private IspPortRepository ispPortRepository;
-    
-    // ============ PHONE LINES ============
+    @Autowired private PhoneLineRepository phoneLineRepository;
+    @Autowired private SmsProviderRepository smsProviderRepository;
+    @Autowired private PhoneBookContactRepository phoneBookContactRepository;
+    @Autowired private SmsCampaignRepository smsCampaignRepository;
+    @Autowired private IspPortRepository ispPortRepository;
     
     @Transactional
     public PhoneLine createPhoneLine(PhoneLine line) {
@@ -46,24 +35,12 @@ public class PhoneService {
         return phoneLineRepository.save(line);
     }
     
-    public List<PhoneLine> getAllPhoneLines() {
-        return phoneLineRepository.findAll();
-    }
-    
-    public List<PhoneLine> getActivePhoneLines() {
-        return phoneLineRepository.findByStatus("active");
-    }
-    
-    public Optional<PhoneLine> getPhoneLineById(Long id) {
-        return phoneLineRepository.findById(id);
-    }
+    public List<PhoneLine> getAllPhoneLines() { return phoneLineRepository.findAll(); }
+    public List<PhoneLine> getActivePhoneLines() { return phoneLineRepository.findByStatus("active"); }
+    public Optional<PhoneLine> getPhoneLineById(Long id) { return phoneLineRepository.findById(id); }
     
     @Transactional
-    public void deletePhoneLine(Long id) {
-        phoneLineRepository.deleteById(id);
-    }
-    
-    // ============ SMS PROVIDERS ============
+    public void deletePhoneLine(Long id) { phoneLineRepository.deleteById(id); }
     
     @Transactional
     public SmsProvider createSmsProvider(SmsProvider provider) {
@@ -74,24 +51,12 @@ public class PhoneService {
         return smsProviderRepository.save(provider);
     }
     
-    public List<SmsProvider> getAllSmsProviders() {
-        return smsProviderRepository.findAll();
-    }
-    
-    public List<SmsProvider> getActiveSmsProviders() {
-        return smsProviderRepository.findByStatus("connected");
-    }
-    
-    public Optional<SmsProvider> getSmsProviderById(Long id) {
-        return smsProviderRepository.findById(id);
-    }
+    public List<SmsProvider> getAllSmsProviders() { return smsProviderRepository.findAll(); }
+    public List<SmsProvider> getActiveSmsProviders() { return smsProviderRepository.findByStatus("connected"); }
+    public Optional<SmsProvider> getSmsProviderById(Long id) { return smsProviderRepository.findById(id); }
     
     @Transactional
-    public void deleteSmsProvider(Long id) {
-        smsProviderRepository.deleteById(id);
-    }
-    
-    // ============ PHONE BOOK ============
+    public void deleteSmsProvider(Long id) { smsProviderRepository.deleteById(id); }
     
     @Transactional
     public PhoneBookContact createContact(PhoneBookContact contact) {
@@ -99,34 +64,17 @@ public class PhoneService {
         contact.setCreatedAt(new Date());
         contact.setUpdatedAt(new Date());
         if (contact.getSpeedDial() != null) {
-            // Check if speed dial already taken
             Optional<PhoneBookContact> existing = phoneBookContactRepository.findBySpeedDial(contact.getSpeedDial());
-            if (existing.isPresent()) {
-                throw new RuntimeException("Speed dial number " + contact.getSpeedDial() + " is already taken");
-            }
+            if (existing.isPresent()) throw new RuntimeException("Speed dial number " + contact.getSpeedDial() + " is already taken");
         }
         return phoneBookContactRepository.save(contact);
     }
     
-    public List<PhoneBookContact> getAllContacts() {
-        return phoneBookContactRepository.findAll();
-    }
-    
-    public List<PhoneBookContact> getContactsByCategory(String category) {
-        return phoneBookContactRepository.findByCategory(category);
-    }
-    
-    public List<PhoneBookContact> getContactsByClient(Long clientId) {
-        return phoneBookContactRepository.findByClientId(clientId);
-    }
-    
-    public List<PhoneBookContact> getSpeedDialContacts() {
-        return phoneBookContactRepository.findBySpeedDialNotNullOrderBySpeedDialAsc();
-    }
-    
-    public Optional<PhoneBookContact> getContactById(Long id) {
-        return phoneBookContactRepository.findById(id);
-    }
+    public List<PhoneBookContact> getAllContacts() { return phoneBookContactRepository.findAll(); }
+    public List<PhoneBookContact> getContactsByCategory(String category) { return phoneBookContactRepository.findByCategory(category); }
+    public List<PhoneBookContact> getContactsByClient(String clientId) { return phoneBookContactRepository.findByClientId(clientId); }
+    public List<PhoneBookContact> getSpeedDialContacts() { return phoneBookContactRepository.findBySpeedDialNotNullOrderBySpeedDialAsc(); }
+    public Optional<PhoneBookContact> getContactById(Long id) { return phoneBookContactRepository.findById(id); }
     
     @Transactional
     public PhoneBookContact updateContact(Long id, PhoneBookContact contact) {
@@ -142,11 +90,7 @@ public class PhoneService {
     }
     
     @Transactional
-    public void deleteContact(Long id) {
-        phoneBookContactRepository.deleteById(id);
-    }
-    
-    // ============ SMS CAMPAIGNS ============
+    public void deleteContact(Long id) { phoneBookContactRepository.deleteById(id); }
     
     @Transactional
     public SmsCampaign createSmsCampaign(SmsCampaign campaign) {
@@ -168,24 +112,19 @@ public class PhoneService {
         if (!"Twilio".equalsIgnoreCase(provider.getProvider())) {
             throw new IllegalArgumentException("SMS delivery is not implemented for " + provider.getProvider() + ". Configure a Twilio provider to send campaigns.");
         }
-        if (provider.getApiKey() == null || provider.getApiKey().isBlank()
-                || provider.getApiSecret() == null || provider.getApiSecret().isBlank()
-                || provider.getSenderId() == null || provider.getSenderId().isBlank()) {
+        if (provider.getApiKey() == null || provider.getApiKey().isBlank() || provider.getApiSecret() == null || provider.getApiSecret().isBlank() || provider.getSenderId() == null || provider.getSenderId().isBlank()) {
             throw new IllegalArgumentException("Twilio Account SID, Auth Token, and sender number are required");
         }
 
         String endpoint = "https://api.twilio.com/2010-04-01/Accounts/" + provider.getApiKey() + "/Messages.json";
-        if (provider.getApiEndpoint() != null && !provider.getApiEndpoint().isBlank()
-                && !endpoint.equals(provider.getApiEndpoint().trim())) {
+        if (provider.getApiEndpoint() != null && !provider.getApiEndpoint().isBlank() && !endpoint.equals(provider.getApiEndpoint().trim())) {
             throw new IllegalArgumentException("Twilio API endpoint must match the configured account");
         }
-        String authorization = Base64.getEncoder().encodeToString(
-            (provider.getApiKey() + ":" + provider.getApiSecret()).getBytes(StandardCharsets.UTF_8));
+        String authorization = Base64.getEncoder().encodeToString((provider.getApiKey() + ":" + provider.getApiSecret()).getBytes(StandardCharsets.UTF_8));
         HttpClient client = HttpClient.newHttpClient();
         for (String recipient : request.getRecipients()) {
             if (recipient == null || recipient.isBlank()) continue;
-            String body = "To=" + encode(recipient) + "&From=" + encode(provider.getSenderId())
-                + "&Body=" + encode(request.getMessage());
+            String body = "To=" + encode(recipient) + "&From=" + encode(provider.getSenderId()) + "&Body=" + encode(request.getMessage());
             HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(endpoint))
                 .header("Authorization", "Basic " + authorization)
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -215,19 +154,10 @@ public class PhoneService {
         return createSmsCampaign(campaign);
     }
 
-    private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
-    }
+    private String encode(String value) { return URLEncoder.encode(value, StandardCharsets.UTF_8); }
     
-    public List<SmsCampaign> getAllSmsCampaigns() {
-        return smsCampaignRepository.findByOrderBySentAtDesc();
-    }
-    
-    public Optional<SmsCampaign> getSmsCampaignById(Long id) {
-        return smsCampaignRepository.findById(id);
-    }
-    
-    // ============ ISP PORTS ============
+    public List<SmsCampaign> getAllSmsCampaigns() { return smsCampaignRepository.findByOrderBySentAtDesc(); }
+    public Optional<SmsCampaign> getSmsCampaignById(Long id) { return smsCampaignRepository.findById(id); }
     
     @Transactional
     public IspPort createIspPort(IspPort port) {
@@ -238,20 +168,10 @@ public class PhoneService {
         return ispPortRepository.save(port);
     }
     
-    public List<IspPort> getAllIspPorts() {
-        return ispPortRepository.findAll();
-    }
-    
-    public List<IspPort> getIspPortsByDirection(String direction) {
-        return ispPortRepository.findByDirection(direction);
-    }
-    
-    public Optional<IspPort> getIspPortById(Long id) {
-        return ispPortRepository.findById(id);
-    }
+    public List<IspPort> getAllIspPorts() { return ispPortRepository.findAll(); }
+    public List<IspPort> getIspPortsByDirection(String direction) { return ispPortRepository.findByDirection(direction); }
+    public Optional<IspPort> getIspPortById(Long id) { return ispPortRepository.findById(id); }
     
     @Transactional
-    public void deleteIspPort(Long id) {
-        ispPortRepository.deleteById(id);
-    }
+    public void deleteIspPort(Long id) { ispPortRepository.deleteById(id); }
 }
