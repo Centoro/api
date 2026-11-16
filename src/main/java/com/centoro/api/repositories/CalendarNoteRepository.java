@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface CalendarNoteRepository extends JpaRepository<CalendarNote, Long> {
     Optional<CalendarNote> findByNoteId(String noteId);
     List<CalendarNote> findByDate(String date);
-    List<CalendarNote> findByProjectId(Long projectId);
+    List<CalendarNote> findByProjectId(String projectId);
     
     @Query("SELECT n FROM CalendarNote n ORDER BY n.date ASC")
     List<CalendarNote> findUpcomingNotes();
