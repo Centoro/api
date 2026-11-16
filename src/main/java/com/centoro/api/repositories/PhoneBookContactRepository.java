@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface PhoneBookContactRepository extends JpaRepository<PhoneBookContact, Long> {
     Optional<PhoneBookContact> findByContactId(String contactId);
     List<PhoneBookContact> findByCategory(String category);
-    List<PhoneBookContact> findByClientId(Long clientId);
+    List<PhoneBookContact> findByClientId(String clientId);
     List<PhoneBookContact> findBySpeedDialNotNullOrderBySpeedDialAsc();
     Optional<PhoneBookContact> findBySpeedDial(Integer speedDial);
 }
