@@ -34,7 +34,8 @@ public class Chat {
     @Temporal(TemporalType.DATE)
     private Date calendarDate;
     
-    @Column(name = "linked_job_id", length = 36)
+    // THIS IS NOW A STRING
+    @Column(name = "linked_job_id", length = 50)
     private String linkedJobId;
     
     @Column(name = "created_at")
