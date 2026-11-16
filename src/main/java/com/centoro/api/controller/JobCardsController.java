@@ -44,7 +44,7 @@ public class JobCardsController {
     }
 
     @GetMapping("/assignee/{assigneeId}")
-    public ResponseEntity<?> getJobCardsByAssignee(@PathVariable Long assigneeId) {
+    public ResponseEntity<?> getJobCardsByAssignee(@PathVariable String assigneeId) {
         List<JobCard> jobCards = jobCardRepository.findByAssigneeId(assigneeId);
         return ResponseEntity.ok(Map.of("success", true, "data", jobCards));
     }
@@ -157,7 +157,7 @@ public class JobCardsController {
     }
 
     @GetMapping("/assignee/{assigneeId}/stats")
-    public ResponseEntity<?> getAssigneeStats(@PathVariable Long assigneeId) {
+    public ResponseEntity<?> getAssigneeStats(@PathVariable String assigneeId) {
         List<JobCard> jobCards = jobCardRepository.findByAssigneeId(assigneeId);
         jobCards.removeIf(j -> j.getDeletedAt() != null);
         long total = jobCards.size();
@@ -213,8 +213,8 @@ public class JobCardsController {
     }
 
     @PostMapping("/{id}/assign")
-    public ResponseEntity<?> assignJob(@PathVariable Long id, @RequestBody Map<String, Long> request) {
-        Long assigneeId = request.get("assigneeId");
+    public ResponseEntity<?> assignJob(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        String assigneeId = request.get("assigneeId") != null ? request.get("assigneeId").toString() : null;
         if (assigneeId == null) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Assignee ID is required"));
         Optional<JobCard> jobOpt = jobCardRepository.findById(id);
         if (jobOpt.isEmpty() || jobOpt.get().getDeletedAt() != null) return ResponseEntity.notFound().build();
