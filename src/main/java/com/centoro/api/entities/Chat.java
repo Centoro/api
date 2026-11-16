@@ -34,8 +34,8 @@ public class Chat {
     @Temporal(TemporalType.DATE)
     private Date calendarDate;
     
-    @Column(name = "linked_job_id")
-    private Long linkedJobId;
+    @Column(name = "linked_job_id", length = 36)
+    private String linkedJobId;
     
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,8 +64,8 @@ public class Chat {
     public void setPriority(String priority) { this.priority = priority; }
     public Date getCalendarDate() { return calendarDate; }
     public void setCalendarDate(Date calendarDate) { this.calendarDate = calendarDate; }
-    public Long getLinkedJobId() { return linkedJobId; }
-    public void setLinkedJobId(Long linkedJobId) { this.linkedJobId = linkedJobId; }
+    public String getLinkedJobId() { return linkedJobId; }
+    public void setLinkedJobId(String linkedJobId) { this.linkedJobId = linkedJobId; }
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
     public Date getUpdatedAt() { return updatedAt; }
