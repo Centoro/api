@@ -20,13 +20,13 @@ public class PhoneBookContact {
     private String number;
     
     @Column(length = 50)
-    private String category; // Client, Staff, Supplier, Emergency, Personal, Custom
+    private String category;
     
     @Column(name = "speed_dial")
     private Integer speedDial;
     
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "client_id", length = 36)
+    private String clientId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", insertable = false, updatable = false)
@@ -43,7 +43,6 @@ public class PhoneBookContact {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getContactId() { return contactId; }
@@ -56,8 +55,8 @@ public class PhoneBookContact {
     public void setCategory(String category) { this.category = category; }
     public Integer getSpeedDial() { return speedDial; }
     public void setSpeedDial(Integer speedDial) { this.speedDial = speedDial; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     public String getNotes() { return notes; }
