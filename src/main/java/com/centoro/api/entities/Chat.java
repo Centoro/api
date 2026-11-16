@@ -14,7 +14,6 @@ public class Chat {
     @Column(name = "chat_id", unique = true, nullable = false, length = 50)
     private String chatId;
     
-    // FIX: Changed from Long to String
     @Column(name = "client_id", nullable = false, length = 36)
     private String clientId;
     
