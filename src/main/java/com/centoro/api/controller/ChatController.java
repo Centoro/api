@@ -83,7 +83,6 @@ public class ChatController {
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
         
-        // Line 88 FIXED: linkedJobId is now String in ChatRequest
         if (request.getLinkedJobId() != null) {
             chat.setLinkedJobId(request.getLinkedJobId());
         }
@@ -173,7 +172,7 @@ public class ChatController {
 
         JobCard saved = jobCardRepository.save(jobCard);
         
-        // Line 262 FIXED: Explicitly convert Long saved.getId() to String
+        // String assigned here to match the entity
         chat.setLinkedJobId(String.valueOf(saved.getId())); 
 
         chat.setStatus("in_progress");
@@ -238,7 +237,7 @@ public class ChatController {
         dto.setStatus(chat.getStatus());
         dto.setPriority(chat.getPriority());
         dto.setCalendarDate(chat.getCalendarDate());
-        dto.setLinkedJobId(chat.getLinkedJobId()); // Already String
+        dto.setLinkedJobId(chat.getLinkedJobId());
         
         dto.setCreatedAt(chat.getCreatedAt());
         dto.setUpdatedAt(chat.getUpdatedAt());
