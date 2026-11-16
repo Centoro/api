@@ -17,8 +17,6 @@ public class PhoneController {
     @Autowired
     private PhoneService phoneService;
 
-    // ============ PHONE LINES ============
-    
     @GetMapping("/lines")
     public ResponseEntity<?> getAllPhoneLines() {
         List<PhoneLine> lines = phoneService.getAllPhoneLines();
@@ -55,8 +53,6 @@ public class PhoneController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Phone line deleted successfully"));
     }
 
-    // ============ SMS PROVIDERS ============
-    
     @GetMapping("/providers")
     public ResponseEntity<?> getAllSmsProviders() {
         List<SmsProvider> providers = phoneService.getAllSmsProviders();
@@ -93,8 +89,6 @@ public class PhoneController {
         return ResponseEntity.ok(Map.of("success", true, "message", "SMS provider disconnected successfully"));
     }
 
-    // ============ PHONE BOOK ============
-    
     @GetMapping("/contacts")
     public ResponseEntity<?> getAllContacts() {
         List<PhoneBookContact> contacts = phoneService.getAllContacts();
@@ -157,8 +151,6 @@ public class PhoneController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Contact deleted successfully"));
     }
 
-    // ============ SMS CAMPAIGNS ============
-    
     @GetMapping("/campaigns")
     public ResponseEntity<?> getAllSmsCampaigns() {
         List<SmsCampaign> campaigns = phoneService.getAllSmsCampaigns();
@@ -197,8 +189,6 @@ public class PhoneController {
         return response;
     }
 
-    // ============ ISP PORTS ============
-    
     @GetMapping("/ports")
     public ResponseEntity<?> getAllIspPorts() {
         List<IspPort> ports = phoneService.getAllIspPorts();
