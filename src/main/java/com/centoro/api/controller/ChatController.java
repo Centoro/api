@@ -145,15 +145,15 @@ public class ChatController {
         String title = (String) request.get("title");
         if (title == null || title.isEmpty()) title = chat.getSubject();
         
-        Long assigneeId = null;
+        String assigneeId = null;
         if (request.get("assigneeId") != null) {
-            try { assigneeId = Long.valueOf(request.get("assigneeId").toString()); } catch (Exception ignored) {}
+            assigneeId = String.valueOf(request.get("assigneeId"));
         }
 
         JobCard jobCard = new JobCard();
         jobCard.setJobCardId("JC-" + String.format("%04d", System.currentTimeMillis() % 10000));
         jobCard.setTitle(title);
-        jobCard.setClientId(chat.getClientId()); // String
+        jobCard.setClientId(chat.getClientId());
         jobCard.setProjectId(null);
         jobCard.setAssigneeId(assigneeId);
         jobCard.setPriority(chat.getPriority());
@@ -249,10 +249,7 @@ public class ChatController {
         dto.setCreatedAt(message.getCreatedAt());
         
         if (message.getStaffId() != null && !message.getStaffId().isBlank()) {
-            try {
-                Long staffIdLong = Long.valueOf(message.getStaffId());
-                staffRepository.findById(staffIdLong).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
-            } catch (NumberFormatException ignored) {}
+            staffRepository.findById(message.getStaffId()).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
         }
         return dto;
     }
