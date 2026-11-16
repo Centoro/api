@@ -31,8 +31,8 @@ public class JobCard {
     @JoinColumn(name = "project_id", insertable = false, updatable = false)
     private Project project;
     
-    @Column(name = "assignee_id")
-    private Long assigneeId;
+    @Column(name = "assignee_id", length = 36)
+    private String assigneeId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id", insertable = false, updatable = false)
@@ -87,76 +87,52 @@ public class JobCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    
     public String getJobCardId() { return jobCardId; }
     public void setJobCardId(String jobCardId) { this.jobCardId = jobCardId; }
-    
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-    
     public String getClientId() { return clientId; }
     public void setClientId(String clientId) { this.clientId = clientId; }
-    
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
-    
     public String getProjectId() { return projectId; }
     public void setProjectId(String projectId) { this.projectId = projectId; }
-    
     public Project getProject() { return project; }
     public void setProject(Project project) { this.project = project; }
-    
-    public Long getAssigneeId() { return assigneeId; }
-    public void setAssigneeId(Long assigneeId) { this.assigneeId = assigneeId; }
-    
+    public String getAssigneeId() { return assigneeId; }
+    public void setAssigneeId(String assigneeId) { this.assigneeId = assigneeId; }
     public Staff getAssignee() { return assignee; }
     public void setAssignee(Staff assignee) { this.assignee = assignee; }
-    
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
-    
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    
     public Date getDueDate() { return dueDate; }
     public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
-    
     public Double getHours() { return hours; }
     public void setHours(Double hours) { this.hours = hours; }
-    
     public String getPeople() { return people; }
     public void setPeople(String people) { this.people = people; }
-    
     public String getService() { return service; }
     public void setService(String service) { this.service = service; }
-    
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
-    
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    
     public String getLoggedBy() { return loggedBy; }
     public void setLoggedBy(String loggedBy) { this.loggedBy = loggedBy; }
-    
     public Date getLoggedAt() { return loggedAt; }
     public void setLoggedAt(Date loggedAt) { this.loggedAt = loggedAt; }
-    
     public String getLockedBy() { return lockedBy; }
     public void setLockedBy(String lockedBy) { this.lockedBy = lockedBy; }
-    
     public String getUpdatedBy() { return updatedBy; }
     public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
-    
     public Date getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
-    
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
-    
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
 }
