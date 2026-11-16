@@ -22,19 +22,13 @@ public class PhoneController {
     @GetMapping("/lines")
     public ResponseEntity<?> getAllPhoneLines() {
         List<PhoneLine> lines = phoneService.getAllPhoneLines();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", lines
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", lines));
     }
 
     @GetMapping("/lines/active")
     public ResponseEntity<?> getActivePhoneLines() {
         List<PhoneLine> lines = phoneService.getActivePhoneLines();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", lines
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", lines));
     }
 
     @GetMapping("/lines/{id}")
@@ -43,20 +37,13 @@ public class PhoneController {
         if (line.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", line.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", line.get()));
     }
 
     @PostMapping("/lines")
     public ResponseEntity<?> createPhoneLine(@RequestBody PhoneLine line) {
         PhoneLine saved = phoneService.createPhoneLine(line);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "Phone line created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Phone line created successfully"));
     }
 
     @DeleteMapping("/lines/{id}")
@@ -65,10 +52,7 @@ public class PhoneController {
             return ResponseEntity.notFound().build();
         }
         phoneService.deletePhoneLine(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Phone line deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Phone line deleted successfully"));
     }
 
     // ============ SMS PROVIDERS ============
@@ -76,19 +60,13 @@ public class PhoneController {
     @GetMapping("/providers")
     public ResponseEntity<?> getAllSmsProviders() {
         List<SmsProvider> providers = phoneService.getAllSmsProviders();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", providers.stream().map(this::toSmsProviderResponse).toList()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", providers.stream().map(this::toSmsProviderResponse).toList()));
     }
 
     @GetMapping("/providers/active")
     public ResponseEntity<?> getActiveSmsProviders() {
         List<SmsProvider> providers = phoneService.getActiveSmsProviders();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", providers.stream().map(this::toSmsProviderResponse).toList()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", providers.stream().map(this::toSmsProviderResponse).toList()));
     }
 
     @GetMapping("/providers/{id}")
@@ -97,20 +75,13 @@ public class PhoneController {
         if (provider.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", toSmsProviderResponse(provider.get())
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", toSmsProviderResponse(provider.get())));
     }
 
     @PostMapping("/providers")
     public ResponseEntity<?> createSmsProvider(@RequestBody SmsProvider provider) {
         SmsProvider saved = phoneService.createSmsProvider(provider);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", toSmsProviderResponse(saved),
-            "message", "SMS provider connected successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", toSmsProviderResponse(saved), "message", "SMS provider connected successfully"));
     }
 
     @DeleteMapping("/providers/{id}")
@@ -119,10 +90,7 @@ public class PhoneController {
             return ResponseEntity.notFound().build();
         }
         phoneService.deleteSmsProvider(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "SMS provider disconnected successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "SMS provider disconnected successfully"));
     }
 
     // ============ PHONE BOOK ============
@@ -130,37 +98,25 @@ public class PhoneController {
     @GetMapping("/contacts")
     public ResponseEntity<?> getAllContacts() {
         List<PhoneBookContact> contacts = phoneService.getAllContacts();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", contacts
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", contacts));
     }
 
     @GetMapping("/contacts/category/{category}")
     public ResponseEntity<?> getContactsByCategory(@PathVariable String category) {
         List<PhoneBookContact> contacts = phoneService.getContactsByCategory(category);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", contacts
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", contacts));
     }
 
     @GetMapping("/contacts/client/{clientId}")
-    public ResponseEntity<?> getContactsByClient(@PathVariable Long clientId) {
+    public ResponseEntity<?> getContactsByClient(@PathVariable String clientId) {
         List<PhoneBookContact> contacts = phoneService.getContactsByClient(clientId);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", contacts
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", contacts));
     }
 
     @GetMapping("/contacts/speed-dial")
     public ResponseEntity<?> getSpeedDialContacts() {
         List<PhoneBookContact> contacts = phoneService.getSpeedDialContacts();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", contacts
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", contacts));
     }
 
     @GetMapping("/contacts/{id}")
@@ -169,26 +125,16 @@ public class PhoneController {
         if (contact.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", contact.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", contact.get()));
     }
 
     @PostMapping("/contacts")
     public ResponseEntity<?> createContact(@RequestBody PhoneBookContact contact) {
         try {
             PhoneBookContact saved = phoneService.createContact(contact);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", saved,
-                "message", "Contact added to phone book"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "Contact added to phone book"));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", e.getMessage()
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
@@ -196,11 +142,7 @@ public class PhoneController {
     public ResponseEntity<?> updateContact(@PathVariable Long id, @RequestBody PhoneBookContact contact) {
         try {
             PhoneBookContact updated = phoneService.updateContact(id, contact);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", updated,
-                "message", "Contact updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", updated, "message", "Contact updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -212,10 +154,7 @@ public class PhoneController {
             return ResponseEntity.notFound().build();
         }
         phoneService.deleteContact(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Contact deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Contact deleted successfully"));
     }
 
     // ============ SMS CAMPAIGNS ============
@@ -223,10 +162,7 @@ public class PhoneController {
     @GetMapping("/campaigns")
     public ResponseEntity<?> getAllSmsCampaigns() {
         List<SmsCampaign> campaigns = phoneService.getAllSmsCampaigns();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", campaigns
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", campaigns));
     }
 
     @GetMapping("/campaigns/{id}")
@@ -235,26 +171,16 @@ public class PhoneController {
         if (campaign.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", campaign.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", campaign.get()));
     }
 
     @PostMapping("/campaigns")
     public ResponseEntity<?> createSmsCampaign(@RequestBody com.centoro.api.dto.SendSmsCampaignRequest request) {
         try {
             SmsCampaign saved = phoneService.sendSmsCampaign(request);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", saved,
-                "message", "SMS sent successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "SMS sent successfully"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", e.getMessage()
-            ));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
@@ -276,19 +202,13 @@ public class PhoneController {
     @GetMapping("/ports")
     public ResponseEntity<?> getAllIspPorts() {
         List<IspPort> ports = phoneService.getAllIspPorts();
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", ports
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", ports));
     }
 
     @GetMapping("/ports/direction/{direction}")
     public ResponseEntity<?> getIspPortsByDirection(@PathVariable String direction) {
         List<IspPort> ports = phoneService.getIspPortsByDirection(direction);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", ports
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", ports));
     }
 
     @GetMapping("/ports/{id}")
@@ -297,20 +217,13 @@ public class PhoneController {
         if (port.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", port.get()
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", port.get()));
     }
 
     @PostMapping("/ports")
     public ResponseEntity<?> createIspPort(@RequestBody IspPort port) {
         IspPort saved = phoneService.createIspPort(port);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", saved,
-            "message", "ISP port configured successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", saved, "message", "ISP port configured successfully"));
     }
 
     @DeleteMapping("/ports/{id}")
@@ -319,9 +232,6 @@ public class PhoneController {
             return ResponseEntity.notFound().build();
         }
         phoneService.deleteIspPort(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "ISP port removed successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "ISP port removed successfully"));
     }
 }
