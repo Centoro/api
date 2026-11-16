@@ -19,8 +19,8 @@ public class ManagedSite {
     @Column(nullable = false, length = 500)
     private String url;
     
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "client_id", length = 36)
+    private String clientId;
     
     @Column(name = "access_type", length = 50)
     private String accessType;
@@ -33,7 +33,6 @@ public class ManagedSite {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getSiteId() { return siteId; }
@@ -42,8 +41,8 @@ public class ManagedSite {
     public void setName(String name) { this.name = name; }
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getAccessType() { return accessType; }
     public void setAccessType(String accessType) { this.accessType = accessType; }
     public Date getCreatedAt() { return createdAt; }
