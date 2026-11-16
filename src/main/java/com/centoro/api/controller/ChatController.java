@@ -82,9 +82,8 @@ public class ChatController {
         chat.setSubject(request.getSubject());
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
-        // Fix for linkedJobId type mismatch:
         if (request.getLinkedJobId() != null) {
-            chat.setLinkedJobId(request.getLinkedJobId());
+            chat.setLinkedJobId(String.valueOf(request.getLinkedJobId()));
         }
 
         Chat saved = chatService.createChat(chat);
@@ -172,14 +171,8 @@ public class ChatController {
 
         JobCard saved = jobCardRepository.save(jobCard);
         
-        // Line 252 Fix: saved.getId() is a Long, setLinkedJobId expects a Long. If yours expects String, we use String.valueOf()
-        try {
-            chat.setLinkedJobId(saved.getId()); 
-        } catch (Exception e) {
-            // If compile error persists, your Chat entity expects String. 
-            // Change your Chat entity to Long, or uncomment the line below:
-            // chat.setLinkedJobId(Long.valueOf(saved.getId())); 
-        }
+        // THE FIX FOR LINE 264 IS HERE:
+        chat.setLinkedJobId(String.valueOf(saved.getId())); 
 
         chat.setStatus("in_progress");
         chat.setUpdatedAt(new Date());
