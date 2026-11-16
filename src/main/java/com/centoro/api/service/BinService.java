@@ -20,7 +20,7 @@ public class BinService {
     private ObjectMapper objectMapper;
     
     @Transactional
-    public BinItem moveToBin(String collection, Long originalId, Object entity, String deletedBy) {
+    public BinItem moveToBin(String collection, String originalId, Object entity, String deletedBy) {
         BinItem binItem = new BinItem();
         binItem.setBinId("BIN-" + String.format("%04d", System.currentTimeMillis() % 10000));
         binItem.setCollection(collection);
@@ -61,7 +61,7 @@ public class BinService {
     }
     
     @Transactional
-    public void restoreBinItemByOriginal(String collection, Long originalId) {
+    public void restoreBinItemByOriginal(String collection, String originalId) {
         binRepository.deleteByCollectionAndOriginalId(collection, originalId);
     }
     
@@ -75,7 +75,7 @@ public class BinService {
         binRepository.deleteById(id);
     }
     
-    public boolean isInBin(String collection, Long originalId) {
+    public boolean isInBin(String collection, String originalId) {
         return binRepository.findByCollection(collection).stream()
             .anyMatch(b -> b.getOriginalId().equals(originalId));
     }
