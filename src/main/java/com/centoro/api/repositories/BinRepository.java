@@ -16,5 +16,5 @@ public interface BinRepository extends JpaRepository<BinItem, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM BinItem b WHERE b.collection = :collection AND b.originalId = :originalId")
-    void deleteByCollectionAndOriginalId(String collection, Long originalId);
+    void deleteByCollectionAndOriginalId(String collection, String originalId);
 }
