@@ -12,7 +12,7 @@ public class ChatDTO {
     private String status;
     private String priority;
     private Date calendarDate;
-    private Long linkedJobId;
+    private String linkedJobId;
     private Date createdAt;
     private Date updatedAt;
     private List<ChatMessageDTO> messages;
@@ -33,8 +33,8 @@ public class ChatDTO {
     public void setPriority(String priority) { this.priority = priority; }
     public Date getCalendarDate() { return calendarDate; }
     public void setCalendarDate(Date calendarDate) { this.calendarDate = calendarDate; }
-    public Long getLinkedJobId() { return linkedJobId; }
-    public void setLinkedJobId(Long linkedJobId) { this.linkedJobId = linkedJobId; }
+    public String getLinkedJobId() { return linkedJobId; }
+    public void setLinkedJobId(String linkedJobId) { this.linkedJobId = linkedJobId; }
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
     public Date getUpdatedAt() { return updatedAt; }
