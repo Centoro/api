@@ -40,7 +40,7 @@ public class CalendarNoteService {
         return calendarNoteRepository.findNotesBetween(start, end);
     }
     
-    public List<CalendarNote> getNotesByProject(Long projectId) {
+    public List<CalendarNote> getNotesByProject(String projectId) {
         return calendarNoteRepository.findByProjectId(projectId);
     }
     
