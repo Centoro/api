@@ -16,8 +16,8 @@ public class CalendarNote {
     @Column(nullable = false)
     private String date;
     
-    @Column(name = "project_id")
-    private Long projectId;
+    @Column(name = "project_id", length = 36)
+    private String projectId;
     
     @Column(columnDefinition = "TEXT")
     private String text;
@@ -36,15 +36,14 @@ public class CalendarNote {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNoteId() { return noteId; }
     public void setNoteId(String noteId) { this.noteId = noteId; }
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public String getProjectId() { return projectId; }
+    public void setProjectId(String projectId) { this.projectId = projectId; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
     public String getImportance() { return importance; }
