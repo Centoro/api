@@ -25,10 +25,7 @@ public class CalendarNoteController {
         List<CalendarNoteDTO> noteDTOs = notes.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", noteDTOs
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", noteDTOs));
     }
 
     @GetMapping("/upcoming")
@@ -37,10 +34,7 @@ public class CalendarNoteController {
         List<CalendarNoteDTO> noteDTOs = notes.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", noteDTOs
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", noteDTOs));
     }
 
     @GetMapping("/date/{date}")
@@ -49,10 +43,7 @@ public class CalendarNoteController {
         List<CalendarNoteDTO> noteDTOs = notes.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", noteDTOs
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", noteDTOs));
     }
 
     @GetMapping("/range")
@@ -63,22 +54,16 @@ public class CalendarNoteController {
         List<CalendarNoteDTO> noteDTOs = notes.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", noteDTOs
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", noteDTOs));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<?> getNotesByProject(@PathVariable Long projectId) {
+    public ResponseEntity<?> getNotesByProject(@PathVariable String projectId) {
         List<CalendarNote> notes = calendarNoteService.getNotesByProject(projectId);
         List<CalendarNoteDTO> noteDTOs = notes.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", noteDTOs
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", noteDTOs));
     }
 
     @GetMapping("/{id}")
@@ -87,31 +72,20 @@ public class CalendarNoteController {
         if (noteOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertToDTO(noteOpt.get())
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(noteOpt.get())));
     }
 
     @PostMapping
     public ResponseEntity<?> createNote(@RequestBody CalendarNote note) {
         CalendarNote saved = calendarNoteService.createNote(note);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "data", convertToDTO(saved),
-            "message", "Calendar note created successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(saved), "message", "Calendar note created successfully"));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(@PathVariable Long id, @RequestBody CalendarNote note) {
         try {
             CalendarNote updated = calendarNoteService.updateNote(id, note);
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", convertToDTO(updated),
-                "message", "Calendar note updated successfully"
-            ));
+            return ResponseEntity.ok(Map.of("success", true, "data", convertToDTO(updated), "message", "Calendar note updated successfully"));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -123,10 +97,7 @@ public class CalendarNoteController {
             return ResponseEntity.notFound().build();
         }
         calendarNoteService.deleteNote(id);
-        return ResponseEntity.ok(Map.of(
-            "success", true,
-            "message", "Calendar note deleted successfully"
-        ));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Calendar note deleted successfully"));
     }
 
     private CalendarNoteDTO convertToDTO(CalendarNote note) {
