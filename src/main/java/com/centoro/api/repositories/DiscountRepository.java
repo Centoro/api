@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, Long> {
-    // FIX: Changed from Long to String
     List<Discount> findByClientId(String clientId);
 }
