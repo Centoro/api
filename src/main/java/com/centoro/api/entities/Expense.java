@@ -23,8 +23,8 @@ public class Expense {
     @Column(length = 100)
     private String category;
     
-    @Column(name = "project_id")
-    private Long projectId;
+    @Column(name = "project_id", length = 36)
+    private String projectId;
     
     @Column(nullable = false, columnDefinition = "DECIMAL(18,2)")
     private Double amount;
@@ -55,7 +55,6 @@ public class Expense {
         pending, approved
     }
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getExpenseId() { return expenseId; }
@@ -66,8 +65,8 @@ public class Expense {
     public void setDescription(String description) { this.description = description; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public String getProjectId() { return projectId; }
+    public void setProjectId(String projectId) { this.projectId = projectId; }
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }
     public Double getVatClaimable() { return vatClaimable; }
