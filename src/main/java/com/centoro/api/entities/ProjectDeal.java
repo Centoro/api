@@ -16,8 +16,8 @@ public class ProjectDeal {
     @Column(nullable = false, length = 255)
     private String name;
     
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "client_id", length = 36)
+    private String clientId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", insertable = false, updatable = false)
@@ -30,7 +30,7 @@ public class ProjectDeal {
     private Integer score = 50;
     
     @Column(length = 50)
-    private String stage = "Lead"; // Lead, Qualified, Proposal, Negotiation, Won, Lost
+    private String stage = "Lead";
     
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,15 +40,14 @@ public class ProjectDeal {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getDealId() { return dealId; }
     public void setDealId(String dealId) { this.dealId = dealId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
     public Double getValue() { return value; }
