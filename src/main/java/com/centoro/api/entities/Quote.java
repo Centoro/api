@@ -14,8 +14,8 @@ public class Quote {
     @Column(name = "quote_id", unique = true)
     private String quoteId;
     
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    @Column(name = "client_id", nullable = false, length = 36)
+    private String clientId;
     
     @Column(nullable = false)
     private String description;
@@ -52,49 +52,34 @@ public class Quote {
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    
     public String getQuoteId() { return quoteId; }
     public void setQuoteId(String quoteId) { this.quoteId = quoteId; }
-    
-    public Long getClientId() { return clientId; }
-    public void setClientId(Long clientId) { this.clientId = clientId; }
-    
+    public String getClientId() { return clientId; }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }
-    
     public Double getDiscountPct() { return discountPct; }
     public void setDiscountPct(Double discountPct) { this.discountPct = discountPct; }
-    
     public Double getDiscountAmount() { return discountAmount; }
     public void setDiscountAmount(Double discountAmount) { this.discountAmount = discountAmount; }
-    
     public Double getTotal() { return total; }
     public void setTotal(Double total) { this.total = total; }
-    
     public String getValidUntil() { return validUntil; }
     public void setValidUntil(String validUntil) { this.validUntil = validUntil; }
-    
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    
     public String getInvoiceId() { return invoiceId; }
     public void setInvoiceId(String invoiceId) { this.invoiceId = invoiceId; }
-    
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
-    
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
-    
     public Date getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
-    
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
 }
