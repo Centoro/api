@@ -172,7 +172,6 @@ public class ChatController {
 
         JobCard saved = jobCardRepository.save(jobCard);
         
-        // String assigned here to match the entity
         chat.setLinkedJobId(String.valueOf(saved.getId())); 
 
         chat.setStatus("in_progress");
@@ -255,8 +254,14 @@ public class ChatController {
         dto.setAttachment(message.getAttachment());
         dto.setCreatedAt(message.getCreatedAt());
         
+        // ✅ FIX: Parse String to Long before passing to findById
         if (message.getStaffId() != null && !message.getStaffId().isBlank()) {
-            staffRepository.findById(message.getStaffId()).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+            try {
+                Long staffIdLong = Long.parseLong(message.getStaffId());
+                staffRepository.findById(staffIdLong).ifPresent((Staff s) -> dto.setStaffName(s.getFirstName() + " " + s.getLastName()));
+            } catch (NumberFormatException e) {
+                // Staff ID is not a valid Long, safely skip setting the staff name
+            }
         }
         return dto;
     }
