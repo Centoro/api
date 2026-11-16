@@ -95,7 +95,7 @@ public class BinController {
     @GetMapping("/check")
     public ResponseEntity<?> checkInBin(
             @RequestParam String collection,
-            @RequestParam Long originalId) {
+            @RequestParam String originalId) {
         boolean inBin = binService.isInBin(collection, originalId);
         return ResponseEntity.ok(Map.of(
             "success", true,
