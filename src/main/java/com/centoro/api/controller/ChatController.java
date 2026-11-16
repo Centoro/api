@@ -82,8 +82,10 @@ public class ChatController {
         chat.setSubject(request.getSubject());
         chat.setPriority(request.getPriority() != null ? request.getPriority() : "medium");
         chat.setCalendarDate(request.getCalendarDate());
+        
+        // Explicit cast to Long to ensure compiler success
         if (request.getLinkedJobId() != null) {
-            chat.setLinkedJobId(String.valueOf(request.getLinkedJobId()));
+            chat.setLinkedJobId(Long.valueOf(request.getLinkedJobId()));
         }
 
         Chat saved = chatService.createChat(chat);
@@ -171,8 +173,8 @@ public class ChatController {
 
         JobCard saved = jobCardRepository.save(jobCard);
         
-        // THE FIX FOR LINE 264 IS HERE:
-        chat.setLinkedJobId(String.valueOf(saved.getId())); 
+        // FORCE CAST TO LONG HERE (Fixes Line 257)
+        chat.setLinkedJobId(saved.getId()); 
 
         chat.setStatus("in_progress");
         chat.setUpdatedAt(new Date());
@@ -236,7 +238,12 @@ public class ChatController {
         dto.setStatus(chat.getStatus());
         dto.setPriority(chat.getPriority());
         dto.setCalendarDate(chat.getCalendarDate());
-        dto.setLinkedJobId(chat.getLinkedJobId());
+        
+        // FORCE CAST TO STRING FOR THE DTO
+        if (chat.getLinkedJobId() != null) {
+            dto.setLinkedJobId(String.valueOf(chat.getLinkedJobId()));
+        }
+        
         dto.setCreatedAt(chat.getCreatedAt());
         dto.setUpdatedAt(chat.getUpdatedAt());
         return dto;
