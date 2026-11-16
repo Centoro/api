@@ -21,7 +21,7 @@ public class QuotesController {
     }
     
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<?> getQuotesByClient(@PathVariable Long clientId) {
+    public ResponseEntity<?> getQuotesByClient(@PathVariable String clientId) {
         return ResponseEntity.ok(Map.of("success", true, "data", quoteRepository.findByClientId(clientId)));
     }
     
