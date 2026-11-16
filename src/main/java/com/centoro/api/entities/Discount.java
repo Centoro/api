@@ -19,7 +19,6 @@ public class Discount {
     @Column(length = 100)
     private String ref;
     
-    // FIX: Changed from Long to String
     @Column(name = "client_id", length = 36)
     private String clientId;
     
